@@ -33,7 +33,7 @@ export default function Index() {
 
           </LinearGradient>
       </TouchableOpacity>
-      <ThemedView style={styles.greyBox} lightColor="#dddddd">
+      <ThemedView style={styles.greyBox} lightColor={Colors.grey} darkColor={Colors.darkgrey}>
         <Image
           source={require("../assets/images/lewandowski.png")}
           resizeMode="contain"

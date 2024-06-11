@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { onValue, ref } from "firebase/database";
 import { db } from "../../firebaseConfig";
+import Table from "@/components/Table";
 
 export default function Tables() {
     const colorScheme = useColorScheme() ?? 'light';
@@ -49,26 +50,7 @@ export default function Tables() {
     
     (table.map((g: any, index: any) => {
         return (
-            <View key={index} style={[styles.tableGroup, {backgroundColor: colorScheme==='light' ? Colors.grey : Colors.darkgrey}]}>
-                <View style={{flexDirection: 'row'}}>
-            <ThemedText style={{flex: 6}} type="subtitle">{g.name}</ThemedText>
-            <ThemedText style={styles.tableText} type="default">Z</ThemedText>
-            <ThemedText style={styles.tableText} type="default">R</ThemedText>
-            <ThemedText style={styles.tableText} type="default">P</ThemedText>
-            <ThemedText style={styles.tableText} type="default">B</ThemedText>
-            <ThemedText style={{flex:2, textAlign: 'center', textAlignVertical: 'center'}} type="defaultSemiBold">PKT</ThemedText>
-                </View>
-            {Object.keys(g.teams).map((key) => (
-                <View key={key} style={styles.tableTeam}>
-                    <ThemedText style={{flex: 6}} type="defaultSemiBold">{g.teams[key].name}</ThemedText>
-                    <ThemedText style={styles.tableText} type="default">{g.teams[key].wins >= 0 ? g.teams[key].wins : 0}</ThemedText>
-                    <ThemedText style={styles.tableText} type="default">{g.teams[key].draws >= 0 ? g.teams[key].draws : 0}</ThemedText>
-                    <ThemedText style={styles.tableText} type="default">{g.teams[key].loses >= 0 ? g.teams[key].loses : 0}</ThemedText>
-                    <ThemedText style={styles.tableText} type="default">{g.teams[key].gs >= 0 || g.teams[key].gs >= 0 ? g.teams[key].gs + ':' + g.teams[key].gc : '0:0'}</ThemedText>
-                    <ThemedText style={{flex: 2, textAlign: 'center'}} type="defaultSemiBold">{(g.teams[key].wins >= 0 || g.teams[key].draws >= 0) ? g.teams[key].wins*3 + g.teams[key].draws : 0}</ThemedText>
-                </View>
-            ))}
-          </View>
+            <Table g={g} index={index} key={index} />
         );
     }))
     :
