@@ -13,9 +13,9 @@ export const Colors = {
   orange: '#ff914d',
   purple: '#8c52ff',
   blue: '#5ce1e6',
-  darkblue: '#024f9f',
+  darkblue: '#2f5fff',
   darkgrey: '#333333',
-  grey: '#cccccc',
+  grey: '#eaeaea',
   light: {
     text: '#11181C',
     background: '#fff',

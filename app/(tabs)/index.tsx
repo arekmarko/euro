@@ -12,13 +12,14 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const theme = useColorScheme() ?? "light";
 
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: Colors.grey, dark: Colors.darkgrey }}
+      headerBackgroundColor={{ lightLeft: Colors.yellow, lightRight: Colors.orange, darkLeft: Colors.purple, darkRight: Colors.orange }}
       headerImage={
         <Image
           source={require("@/assets/images/modric.png")}
@@ -35,7 +36,7 @@ export default function HomeScreen() {
         style={[
           styles.container,
           {
-            backgroundColor: theme === "light" ? Colors.orange : Colors.darkgrey,
+            backgroundColor: theme === "light" ? Colors.grey : Colors.darkgrey,
           },
         ]}
       >
@@ -88,8 +89,8 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   parallaxLogo: {
-    height: "200%",
-    width: "200%",
+    height: "150%",
+    width: "150%",
     alignSelf: "center",
   },
   logo: {
