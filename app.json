@@ -4,7 +4,7 @@
     "slug": "euro",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo_big.png",
+    "icon": "./assets/images/euroicon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo_big.png",
+        "foregroundImage": "./assets/images/euroicon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.arekmarko8.euro"
@@ -28,7 +28,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

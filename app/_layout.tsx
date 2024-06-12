@@ -14,6 +14,10 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Poppins: require('../assets/fonts/Poppins-Regular.ttf'),
+    Exo2: require('../assets/fonts/Exo2-Regular.ttf'),
+    Exo2V: require('../assets/fonts/Exo2-VariableFont_wght.ttf'),
+    Crimson: require('../assets/fonts/CrimsonText-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -31,6 +35,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name='register' options={{ headerShown: false}} />
       </Stack>
     </ThemeProvider>
   );

@@ -13,6 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { auth } from "@/firebaseConfig";
 
 export default function HomeScreen() {
   const theme = useColorScheme() ?? "light";
@@ -48,7 +49,7 @@ export default function HomeScreen() {
         <View style={{ flex: 3 }}>
           <View style={{ flexDirection: "row" }}>
             <View style={{ flex: 4, paddingHorizontal: 10 }}>
-              <ThemedText type="subtitle">Arkadiusz</ThemedText>
+              <ThemedText type="subtitle">{auth.currentUser?.email}</ThemedText>
               <ThemedText type="boldNumber" lightColor={Colors.darkblue} darkColor={Colors.darkblue}>
                 21 <ThemedText type="light">- Twoje punkty</ThemedText>
               </ThemedText>
@@ -71,6 +72,9 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Tabela</ThemedText>
+      </ThemedView>
     </ParallaxScrollView>
   );
 }

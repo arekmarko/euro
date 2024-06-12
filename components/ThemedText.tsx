@@ -38,22 +38,24 @@ export function ThemedText({
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
+    fontFamily: 'Exo2V'
   },
   light: {
     fontSize: 14,
-    fontWeight: 'normal'
+    fontFamily: 'Exo2V'
   },
   defaultSemiBold: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    fontFamily: 'Exo2V'
   },
   title: {
     fontSize: 36,
-    fontWeight: 'bold',
+    fontFamily: 'Exo2V'
   },
   subtitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Exo2V'
   },
   link: {
     lineHeight: 30,
@@ -63,5 +65,6 @@ const styles = StyleSheet.create({
   boldNumber : {
     fontSize: 22,
     fontWeight: 'bold',
+    fontFamily: 'Exo2V'
   }
 });

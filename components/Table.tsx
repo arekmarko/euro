@@ -19,9 +19,9 @@ export default function Table({g,index}:any) {
             <ThemedText style={styles.tableText} type="default">B</ThemedText>
             <ThemedText style={{flex:2, textAlign: 'center', textAlignVertical: 'center'}} type="defaultSemiBold">PKT</ThemedText>
                 </View>
-            {Object.keys(g.teams).map((key) => (
+            {Object.keys(g.teams).map((key, index) => (
                 <View key={key} style={styles.tableTeam}>
-                    <ThemedText style={{flex: 6}} type="defaultSemiBold">{g.teams[key].name}</ThemedText>
+                    <ThemedText style={{flex: 6}} type="defaultSemiBold">{index + 1}.{g.teams[key].name}</ThemedText>
                     <ThemedText style={styles.tableText} type="default">{g.teams[key].wins >= 0 ? g.teams[key].wins : 0}</ThemedText>
                     <ThemedText style={styles.tableText} type="default">{g.teams[key].draws >= 0 ? g.teams[key].draws : 0}</ThemedText>
                     <ThemedText style={styles.tableText} type="default">{g.teams[key].loses >= 0 ? g.teams[key].loses : 0}</ThemedText>
