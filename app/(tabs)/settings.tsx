@@ -1,11 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, TouchableNativeFeedback, View, Switch, useColorScheme } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Colors } from '@/constants/Colors';
+import { auth } from '@/firebaseConfig';
+import { router } from 'expo-router';
+import { useState } from 'react';
 
 export default function TabTwoScreen() {
   return (
@@ -84,6 +88,11 @@ export default function TabTwoScreen() {
           ),
         })}
       </Collapsible>
+      <TouchableNativeFeedback onPress={() => {auth.signOut(), router.dismissAll()}}>
+        <ThemedView lightColor={Colors.grey} darkColor={Colors.darkgrey} style={styles.logoutButton}>
+          <ThemedText type='subtitle'>Wyloguj się</ThemedText>
+        </ThemedView>
+      </TouchableNativeFeedback>
     </ParallaxScrollView>
   );
 }
@@ -97,4 +106,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  logoutButton: {
+    padding: 10,
+    borderRadius: 10,
+    alignSelf: 'center',
+    alignItems: 'center',
+    width: '50%',
+    margin: 20
+  }
 });

@@ -1,11 +1,12 @@
 import { Text, type TextProps, StyleSheet } from 'react-native';
 
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { Colors } from '@/constants/Colors';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'boldNumber' | 'light';
+  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'boldNumber' | 'light' | 'error';
 };
 
 export function ThemedText({
@@ -28,6 +29,7 @@ export function ThemedText({
         type === 'link' ? styles.link : undefined,
         type === 'boldNumber' ? styles.boldNumber : undefined,
         type === 'light' ? styles.light : undefined,
+        type === 'error' ? styles.error : undefined,
         style,
       ]}
       {...rest}
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Exo2V'
   },
   light: {
-    fontSize: 14,
+    fontSize: 10,
     fontFamily: 'Exo2V'
   },
   defaultSemiBold: {
@@ -59,12 +61,17 @@ const styles = StyleSheet.create({
   },
   link: {
     lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
+    fontSize: 18,
+    color: Colors.darkblue,
   },
   boldNumber : {
     fontSize: 22,
     fontWeight: 'bold',
     fontFamily: 'Exo2V'
+  },
+  error: {
+    fontSize: 16,
+    fontFamily: 'Exo2V',
+    color: '#ff0000'
   }
 });

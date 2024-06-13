@@ -37,6 +37,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="matches"
+        options={{
+          title: "Mecze",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "football" : "football-outline"} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="standings"
+        options={{
+          title: "Ranking",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "trophy" : "trophy-outline"} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: "Ustawienia",

@@ -5,6 +5,12 @@ import {
   Platform,
   View,
   useColorScheme,
+  BackHandler,
+  ToastAndroid,
+  ScrollView,
+  useWindowDimensions,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
@@ -12,15 +18,84 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import { auth } from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
+import { useEffect, useState } from "react";
+import { router, useNavigation } from "expo-router";
+import { limitToFirst, onValue, query, ref } from "firebase/database";
+import Table from "@/components/Table";
+
+type UserData = {
+  email: string;
+  username: string;
+  points: number;
+};
+
+type Match = {
+  Home: string;
+  Away: string;
+  Date: string;
+  Hour: string;
+  Matchday: number;
+  Phase: string;
+  Stadium: string;
+};
 
 export default function HomeScreen() {
   const theme = useColorScheme() ?? "light";
-
+  const [table, setTable] = useState<string[]>([]);
+  const [userData, setUserData] = useState<UserData>({
+    email: "",
+    username: "",
+    points: 0,
+  });
+  const [matches, setMatches] = useState<Match[]>([]);
+  const routers = useNavigation();
+  const dimensions = useWindowDimensions();
+  useEffect(() => {
+    onValue(
+      ref(db, "users/" + auth.currentUser?.displayName + "/"),
+      (snapshot) => {
+        const data = snapshot.val();
+        setUserData(data);
+      }
+    );
+    const dbRef = ref(db, "groups/");
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      const newData = Object.keys(data).map((key) => ({
+        ...data[key],
+      }));
+      setTable(newData);
+    });
+    onValue(query(ref(db, "matches/"), limitToFirst(5)), (snapshot) => {
+      const data = snapshot.val();
+      const newData = Object.keys(data).map((key) => ({
+        ...data[key],
+      }));
+      setMatches(newData);
+    });
+    const backAction = () => {
+      if (routers.getState().index != 0) {
+        router.navigate("(tabs)");
+      } else {
+        BackHandler.exitApp();
+      }
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, []);
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ lightLeft: Colors.yellow, lightRight: Colors.orange, darkLeft: Colors.purple, darkRight: Colors.orange }}
+      headerBackgroundColor={{
+        lightLeft: Colors.yellow,
+        lightRight: Colors.orange,
+        darkLeft: Colors.purple,
+        darkRight: Colors.orange,
+      }}
       headerImage={
         <Image
           source={require("@/assets/images/modric.png")}
@@ -30,7 +105,7 @@ export default function HomeScreen() {
       }
     >
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Witaj!</ThemedText>
         <HelloWave />
       </ThemedView>
       <View
@@ -49,23 +124,37 @@ export default function HomeScreen() {
         <View style={{ flex: 3 }}>
           <View style={{ flexDirection: "row" }}>
             <View style={{ flex: 4, paddingHorizontal: 10 }}>
-              <ThemedText type="subtitle">{auth.currentUser?.email}</ThemedText>
-              <ThemedText type="boldNumber" lightColor={Colors.darkblue} darkColor={Colors.darkblue}>
-                21 <ThemedText type="light">- Twoje punkty</ThemedText>
+              <ThemedText type="subtitle" numberOfLines={1}>
+                {auth.currentUser?.displayName}
               </ThemedText>
-              <ThemedText type="boldNumber" lightColor={Colors.darkblue} darkColor={Colors.darkblue}>
-                2 <ThemedText type="light">- Miejsce w rankingu</ThemedText>
+              <ThemedText type="light" numberOfLines={1}>
+                {auth.currentUser?.email}
+              </ThemedText>
+              <ThemedText
+                type="boldNumber"
+                lightColor={Colors.darkblue}
+                darkColor={Colors.darkblue}
+              >
+                {userData ? userData?.points : 0}{" "}
+                <ThemedText type="default">- Twoje punkty</ThemedText>
+              </ThemedText>
+              <ThemedText
+                type="boldNumber"
+                lightColor={Colors.darkblue}
+                darkColor={Colors.darkblue}
+              >
+                2 <ThemedText type="default">- Miejsce w rankingu</ThemedText>
               </ThemedText>
             </View>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
               <Image
                 source={require("@/assets/images/bellingham.png")}
                 resizeMode="contain"
                 style={{
-                  alignSelf: 'flex-start',
+                  alignSelf: "flex-start",
                   height: "150%",
                   width: "150%",
-                  transform: [{ scaleX: -1 }, {translateY: -10}],
+                  transform: [{ scaleX: -1 }, { translateY: -10 }],
                 }}
               />
             </View>
@@ -73,8 +162,35 @@ export default function HomeScreen() {
         </View>
       </View>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Tabela</ThemedText>
+        <ThemedText type="title">Najbliższe mecze</ThemedText>
       </ThemedView>
+      {matches.length > 0 ? <FlatList
+        data={matches}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ width: 20 }}></View>}
+        renderItem={({ item, index }) => 
+        <ThemedView>
+          <ThemedText type="default">{item.Home} - {item.Away}</ThemedText>
+        </ThemedView>
+        }
+      /> : <ActivityIndicator animating={true} color={Colors.darkblue} size={"large"} />}
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Grupy</ThemedText>
+      </ThemedView>
+      {table.length > 0 ? <FlatList
+        data={table}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ width: 20 }}></View>}
+        renderItem={({ item, index }) => (
+          <Table
+            g={item}
+            index={index}
+            style={{ width: dimensions.width * 0.7 }}
+          />
+        )}
+      /> : <ActivityIndicator animating={true} color={Colors.darkblue} size={"large"} /> }
     </ParallaxScrollView>
   );
 }

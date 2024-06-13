@@ -16,6 +16,7 @@ import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
+import { ThemedSeparator } from "./ThemedSeparator";
 
 export default function LoginModal({ isVisible, onClose }: any) {
   const colorScheme = useColorScheme() ?? "light";
@@ -65,22 +66,16 @@ export default function LoginModal({ isVisible, onClose }: any) {
               />
             </Pressable>
           </View>
-          <View
-            style={[
-              styles.separator,
-              {
-                backgroundColor:
-                  colorScheme === "light" ? Colors.darkgrey : Colors.grey,
-                margin: 0,
-              },
-            ]}
-          ></View>
+          <ThemedSeparator style={{width: '90%'}} />
           <View style={styles.modalContent}>
             <ThemedText type="default">Email</ThemedText>
             <TextInput
               inputMode="email"
               value={login}
               onChangeText={setLogin}
+              maxLength={64}
+              autoCapitalize="none"
+              autoComplete="email"
               style={[
                 styles.input,
                 {
@@ -95,6 +90,8 @@ export default function LoginModal({ isVisible, onClose }: any) {
               secureTextEntry={true}
               value={password}
               onChangeText={setPassword}
+              maxLength={64}
+              autoCapitalize="none"
               style={[
                 styles.input,
                 {
@@ -121,26 +118,17 @@ export default function LoginModal({ isVisible, onClose }: any) {
                 style={[
                   styles.button,
                   {
-                    backgroundColor:
-                      colorScheme === "light" ? "" : Colors.darkblue,
+                    backgroundColor: Colors.darkblue,
                   },
                 ]}
               >
-                <ThemedText type="subtitle">Zaloguj się</ThemedText>
+                <ThemedText type="subtitle" style={{color: Colors.white}}>Zaloguj się</ThemedText>
               </View>
             </TouchableNativeFeedback>
-            <View
-              style={[
-                styles.separator,
-                {
-                  backgroundColor:
-                    colorScheme === "light" ? Colors.darkgrey : Colors.grey,
-                },
-              ]}
-            ></View>
+            <ThemedSeparator style={{width: '80%'}} />
             <Pressable
               style={{ margin: 10 }}
-              onPress={() => router.navigate('register')}
+              onPress={() => {onClose(); router.navigate('register')}}
             >
               <ThemedText style={{ textAlign: "center" }} type="default">
                 Nie masz konta?{" "}

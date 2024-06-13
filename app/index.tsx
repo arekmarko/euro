@@ -2,6 +2,7 @@ import LoginModal from "@/components/LoginModal";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
+import { auth } from "@/firebaseConfig";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -16,6 +17,15 @@ export default function Index() {
   const onModalClose = () => {
     setIsModalVisible(false);
   };
+  function onAuthStateChanged(user:any) {
+    if (user) {
+      router.navigate('(tabs)');
+    }
+  }
+  useEffect(() => {
+    const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
   return (
     <View style={[styles.container, {height: dimensions.height}]}>
       <Image
