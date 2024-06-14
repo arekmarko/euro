@@ -10,84 +10,40 @@ import { Colors } from '@/constants/Colors';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { ThemedSeparator } from '@/components/ThemedSeparator';
 
-export default function TabTwoScreen() {
+export default function Settings() {
+  const [notifications, setNotifications] = useState(true);
+  const handleNotifications = () => {
+    setNotifications(prev => !prev);
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ lightLeft: '#D0D0D0', lightRight: '#E0E0E0', darkLeft: '#353636', darkRight: '#656565' }}
       headerImage={<Ionicons size={310} name="cog" style={styles.headerImage} />}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
+        <ThemedText type="title">Ustawienia</ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-          to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
+      <ThemedSeparator />
+      <ThemedText type='subtitle'>{auth.currentUser?.displayName}</ThemedText>
+      <ThemedText type='default'>{auth.currentUser?.email}</ThemedText>
+      <ThemedSeparator />
+      
+      {/* <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+        <ThemedText>Potrzebna zmiana hasła?</ThemedText>
+        <TouchableNativeFeedback>
+          <ThemedView lightColor={Colors.grey} darkColor={Colors.darkgrey} style={styles.button}>
+          <ThemedText>Zmień hasło</ThemedText>
+          </ThemedView>
+        </TouchableNativeFeedback>
+      </View>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+        <ThemedText>Chcesz dostawać powiadomienia?</ThemedText>
+        <Switch value={notifications} onValueChange={handleNotifications} trackColor={{false: Colors.darkgrey}} style={{transform: [{scale: 1.2}]}}/>
+      </View> */}
+      
+      
+      
       <TouchableNativeFeedback onPress={() => {auth.signOut(), router.dismissAll()}}>
         <ThemedView lightColor={Colors.grey} darkColor={Colors.darkgrey} style={styles.logoutButton}>
           <ThemedText type='subtitle'>Wyloguj się</ThemedText>
@@ -113,5 +69,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '50%',
     margin: 20
+  },
+  button: {
+    padding: 5,
+    borderRadius: 10,
+    minWidth: '30%',
+    alignItems: 'center'
   }
 });

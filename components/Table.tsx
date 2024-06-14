@@ -66,15 +66,15 @@ export default function Table({ g, index, style }: any) {
         {Object.keys(g.teams).map((key, index) => (
           <View key={key} style={styles.tableTeam}>
             <View style={{ flex: 5, flexDirection: "row" }}>
-              <ThemedText type="default" numberOfLines={1} style={{flex: 2, textAlign: 'right'}} >
+              <ThemedText type="default" numberOfLines={1} style={{flex: 3, textAlign: 'right'}} >
                 {index + 1}.
               </ThemedText>
               <Image
                 source={require("../assets/images/flags/poland.png")}
                 resizeMode="center"
-                style={{flex:2, height: '100%', margin: 2, alignSelf: 'center' }}
+                style={{flex:3, height: '100%', margin: 2, alignSelf: 'center' }}
               />
-              <ThemedText type="defaultSemiBold" numberOfLines={1} style={{flex: 12}}>
+              <ThemedText type="defaultSemiBold" numberOfLines={1} style={{flex: 10}}>
                 {g.teams[key].name}
               </ThemedText>
             </View>
