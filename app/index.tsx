@@ -2,32 +2,79 @@ import LoginModal from "@/components/LoginModal";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
-import { auth } from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
+import { onAuthStateChanged } from "firebase/auth";
+import { onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View, useColorScheme, useWindowDimensions } from "react-native";
+import { BackHandler, Image, Linking, Modal, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, useColorScheme, useWindowDimensions } from "react-native";
 
+type Version = {
+  name: string;
+  link: string;
+}
 export default function Index() {
   const dimensions = useWindowDimensions();
+  const colorScheme = useColorScheme() ?? 'light';
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [version, setVersion] = useState<Version>({name: '1.0.1', link: ''});
+  const currentVersion = '1.0.1';
   const onModalOpen = () => {
     setIsModalVisible(true);
   };
   const onModalClose = () => {
     setIsModalVisible(false);
   };
-  function onAuthStateChanged(user:any) {
-    if (user) {
-      router.navigate('(tabs)');
-    }
-  }
   useEffect(() => {
-    const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+    let subscriber;
+    onValue(ref(db, "version/"), (snapshot) => {
+        const data = snapshot.val();
+        setVersion(data);
+        if (currentVersion != data.name){
+          setUpdate(true);
+        } else {
+          subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+        }
+      }
+    );
+    function onAuthStateChanged(user:any) {
+      if (user) {
+        router.navigate('(tabs)');
+      }
+    }
     return subscriber;
   }, []);
   return (
     <View style={[styles.container, {height: dimensions.height}]}>
+      <Modal animationType="fade"
+        transparent={true}
+        visible={update}
+        onRequestClose={() => BackHandler.exitApp()}
+        >
+          <View style={{
+            height: "100%",
+            width: "100%",
+            position: "absolute",
+            backgroundColor: colorScheme === "light" ? "#0004" : "#000d",
+            justifyContent: "center",
+          }}></View>
+          <View style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{width: '80%', padding: 20, gap: 20, borderRadius: 20, backgroundColor:  colorScheme === "light" ? Colors.grey : Colors.darkgrey, alignSelf: 'center', alignItems: 'center'}}>
+            <ThemedText type="subtitle">Aktualizacja</ThemedText>
+            <ThemedText type="default">Dostępna jest nowsza wersja aplikacji.</ThemedText>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '80%'}}>
+              <TouchableNativeFeedback onPress={() => BackHandler.exitApp()}>
+              <ThemedView darkColor="#777" style={{padding: 10, borderRadius: 10}}><ThemedText>Wyjdź</ThemedText></ThemedView>
+              </TouchableNativeFeedback>
+              <TouchableNativeFeedback onPress={() => Linking.openURL(version.link)}>
+              <ThemedView darkColor="#777" style={{padding: 10, borderRadius: 10}}><ThemedText>Pobierz</ThemedText></ThemedView>
+              </TouchableNativeFeedback>
+            </View>
+          </View>
+          </View>
+      </Modal>
       <Image
         source={require("../assets/images/logo_small.png")}
         resizeMode="center"

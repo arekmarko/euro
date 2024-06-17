@@ -31,7 +31,6 @@ export default function LoginModal({ isVisible, onClose }: any) {
     signInWithEmailAndPassword(auth, login, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user);
         resetInputs();
         onClose();
         router.navigate("(tabs)");

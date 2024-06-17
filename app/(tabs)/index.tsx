@@ -31,6 +31,7 @@ type UserData = {
   email: string;
   username: string;
   points: number;
+  ranking: number;
 };
 
 type Match = {
@@ -53,6 +54,7 @@ export default function HomeScreen() {
     email: "",
     username: "",
     points: 0,
+    ranking: 0
   });
   const [matches, setMatches] = useState<Match[]>([]);
   const routers = useNavigation();
@@ -155,7 +157,7 @@ export default function HomeScreen() {
                   lightColor={Colors.darkblue}
                   darkColor={Colors.darkblue}
                 >
-                  2 <ThemedText type="default">- Miejsce w rankingu</ThemedText>
+                  {userData ? userData?.ranking : '0'} <ThemedText type="default">- Miejsce w rankingu</ThemedText>
                 </ThemedText>
               </View>
               <View style={{ flex: 1, justifyContent: "center" }}>

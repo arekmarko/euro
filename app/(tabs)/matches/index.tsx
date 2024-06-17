@@ -36,14 +36,14 @@ export default function matches() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{
-        lightLeft: "#D0D0D0",
-        lightRight: "#E0E0E0",
-        darkLeft: "#353636",
-        darkRight: "#656565",
+        lightLeft: Colors.yellow,
+        lightRight: "red",
+        darkLeft: "#111",
+        darkRight: "#ff3f5f",
       }}
       headerImage={
         <Image
-          source={require("@/assets/images/ronaldo.png")}
+          source={require("@/assets/images/musiala.png")}
           resizeMode="contain"
           style={styles.parallaxLogo}
         />
@@ -92,8 +92,8 @@ export default function matches() {
 
 const styles = StyleSheet.create({
   parallaxLogo: {
-    height: "150%",
-    width: "150%",
+    height: "120%",
+    width: "120%",
     alignSelf: "center",
   },
   container: {},

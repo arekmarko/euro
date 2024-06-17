@@ -11,6 +11,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedSeparator } from "./ThemedSeparator";
+import { Flag } from "@/constants/Flags";
 
 export default function Table({ g, index, style }: any) {
   const colorScheme = useColorScheme() ?? "light";
@@ -70,7 +71,7 @@ export default function Table({ g, index, style }: any) {
                 {index + 1}.
               </ThemedText>
               <Image
-                source={require("../assets/images/flags/poland.png")}
+                source={Flag[g.teams[key].name] ? Flag[g.teams[key].name] : require("../assets/images/flags/polska.png")}
                 resizeMode="center"
                 style={{flex:3, height: '100%', margin: 2, alignSelf: 'center' }}
               />

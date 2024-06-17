@@ -66,7 +66,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
         }}
       ></Pressable>
       <View style={[styles.container, {backgroundColor: colorScheme==='light' ? Colors.grey : Colors.darkgrey}]}>
-        <ThemedText type="title">Wytypuj wynik</ThemedText>
+        <ThemedText type="title" numberOfLines={1}>Wytypuj wynik</ThemedText>
         <View style={{ flexDirection: "row", flex: 1, alignItems: 'center' }}>
           <View style={{flex: 1, alignItems: 'center'}}>
             <ThemedText type="subtitle" numberOfLines={1}>{match?.Home}</ThemedText>
@@ -77,7 +77,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 renderItem={(data, index) => (
                   <ThemedText
                     type="boldNumber"
-                    style={{ fontSize: 36, width: 100, textAlign: "center" }}
+                    style={{ fontSize: 42, width: 100, textAlign: "center" }}
                   >
                     {data}
                   </ThemedText>
@@ -85,9 +85,9 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleHomePrediction(data);
                 }}
-                wrapperHeight={140}
+                wrapperHeight={160}
                 wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
-                itemHeight={60}
+                itemHeight={70}
                 highlightColor="#777"
                 highlightBorderWidth={2}
               />
@@ -102,7 +102,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 renderItem={(data, index) => (
                   <ThemedText
                     type="boldNumber"
-                    style={{ fontSize: 36, width: 100, textAlign: "center" }}
+                    style={{ fontSize: 42, width: 100, textAlign: "center" }}
                   >
                     {data}
                   </ThemedText>
@@ -110,9 +110,9 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleAwayPrediction(data);
                 }}
-                wrapperHeight={140}
+                wrapperHeight={160}
                 wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
-                itemHeight={60}
+                itemHeight={70}
                 highlightColor="#777"
                 highlightBorderWidth={2}
               />
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "80%",
-    height: "50%",
+    height: "60%",
     borderRadius: 10,
     padding: 20
   },

@@ -1,4 +1,5 @@
 import {
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -6,11 +7,12 @@ import {
   TextInput,
   ToastAndroid,
   TouchableNativeFeedback,
+  TouchableOpacity,
   View,
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { auth, db } from "@/firebaseConfig";
@@ -22,6 +24,9 @@ import {
 import { router } from "expo-router";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
 import { onValue, push, ref, set } from "firebase/database";
+import { ThemedView } from "@/components/ThemedView";
+import { Ionicons } from "@expo/vector-icons";
+import { Flag } from "@/constants/Flags";
 
 export default function register() {
   const colorScheme = useColorScheme() ?? "light";
@@ -32,6 +37,49 @@ export default function register() {
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [favouriteError, setFavouriteError] = useState("");
+  const [dropdown, setDropdown] = useState(false);
+  const [favourite, setFavourite] = useState("");
+  const data = [
+    "Albania",
+    "Anglia",
+    "Austria",
+    "Belgia",
+    "Chorwacja",
+    "Czechy",
+    "Dania",
+    "Francja",
+    "Gruzja",
+    "Hiszpania",
+    "Holandia",
+    "Niemcy",
+    "Polska",
+    "Portugalia",
+    "Rumunia",
+    "Serbia",
+    "Słowacja",
+    "Słowenia",
+    "Szkocja",
+    "Szwajcaria",
+    "Turcja",
+    "Ukraina",
+    "Węgry",
+    "Włochy",
+  ];
+  const [userCount, setUserCount] = useState(0);
+  useEffect(() => {
+    const dbRef = ref(db, "users/");
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      const newData = Object.keys(data).map((key) => ({
+        ...data[key],
+      }));
+      setUserCount(newData.length);
+    });
+  }, []);
+  const handleDropdown = () => {
+    setDropdown((prev) => !prev);
+  };
   const resetInputs = () => {
     setEmail("");
     setPassword("");
@@ -41,8 +89,14 @@ export default function register() {
     setUsernameError("");
     setEmailError("");
     setPasswordError("");
+    setFavouriteError("");
   };
-  const register = (username: string, email: string, password: string) => {
+  const register = (
+    username: string,
+    email: string,
+    password: string,
+    favourite: string
+  ) => {
     resetErrors();
     if (username.length == 0) {
       setUsernameError("Pole nie może być puste.");
@@ -59,13 +113,16 @@ export default function register() {
     if (password.length < 6) {
       setPasswordError("Hasło powinno zawierać conajmniej 6 znaków.");
     }
+    if (favourite.length == 0) {
+      setFavouriteError("Pole nie może być puste.");
+    }
     const dbRef = ref(db, "users/");
     onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
       const newData = Object.keys(data).map((key) => ({
         ...data[key],
       }));
-      newData.forEach((value) => {
+      newData.forEach((value, index) => {
         if (value.displayName == username) {
           setUsernameError("Nazwa użytkownika jest już zajęta.");
         }
@@ -74,7 +131,8 @@ export default function register() {
     if (
       usernameError.length == 0 &&
       emailError.length == 0 &&
-      passwordError.length == 0
+      passwordError.length == 0 &&
+      favouriteError.length == 0
     ) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -87,6 +145,8 @@ export default function register() {
                 username: username,
                 email: email,
                 points: 0,
+                favourite: favourite,
+                ranking: userCount + 1,
               }).then(() => {
                 router.navigate("(tabs)");
                 ToastAndroid.show(
@@ -98,7 +158,7 @@ export default function register() {
           );
         })
         .catch((error) => {
-          console.log(error);
+          //console.log(error);
           if (error.code == AuthErrorCodes.EMAIL_EXISTS) {
             setEmailError("Ten e-mail jest już zajęty.");
           }
@@ -131,7 +191,7 @@ export default function register() {
           resizeMode="center"
           style={{ margin: 50, height: "20%", width: "80%" }}
         />
-        <View style={{ flex: 1, width: "100%" }}>
+        <View style={{  width: "100%" }}>
           <ThemedText type="title" style={{ textAlign: "center" }}>
             Zarejestruj się
           </ThemedText>
@@ -217,11 +277,83 @@ export default function register() {
             ) : (
               <></>
             )}
+            <ThemedText type="default">Twój faworyt turnieju</ThemedText>
+            <View>
+              <TouchableNativeFeedback onPress={handleDropdown}>
+                <ThemedView
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    borderRadius: 5,
+                    borderBottomLeftRadius: dropdown ? 0 : 5,
+                    borderBottomRightRadius: dropdown ? 0 : 5,
+                    borderBottomColor: Colors.white,
+                    borderColor: favouriteError ? "red" : Colors.darkblue,
+                    borderWidth: 1,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingHorizontal: 10,
+                    flexDirection: "row",
+                  }}
+                  lightColor={Colors.white}
+                  darkColor="#666"
+                >
+                  <ThemedText>{favourite}</ThemedText>
+                  <Ionicons
+                    name="chevron-down"
+                    color={
+                      colorScheme === "light" ? Colors.black : Colors.white
+                    }
+                    size={18}
+                  />
+                </ThemedView>
+              </TouchableNativeFeedback>
+              {dropdown ? (
+                <ScrollView
+                  style={{
+                    padding: 5,
+                    height: 150,
+                    backgroundColor: "#666",
+                    borderBottomLeftRadius: 5,
+                    borderBottomRightRadius: 5,
+                  }}
+                >
+                  {data.map((item, index) => (
+                    <View key={index}>
+                      <TouchableOpacity
+                        style={{ height: 40, justifyContent: "center" }}
+                        onPress={() => {
+                          setFavourite(item), handleDropdown();
+                        }}
+                      >
+                        <View style={{flexDirection: 'row'}}>
+
+                        <Image
+                          source={Flag[item]}
+                          resizeMode="center"
+                          style={{height: '90%', width: 30}}
+                          />
+                          <ThemedText>{item}</ThemedText>
+                          </View>
+                      </TouchableOpacity>
+                      <ThemedSeparator style={{ margin: 3 }} />
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : (
+                <></>
+              )}
+              {favouriteError.length > 0 ? (
+                <ThemedText type="error">{favouriteError}</ThemedText>
+              ) : (
+                <></>
+              )}
+            </View>
             <ThemedSeparator />
-            <View style={{}}>
+            <View >
               <TouchableNativeFeedback
                 onPress={() => {
-                  register(username, email, password);
+                  register(username, email, password, favourite);
                 }}
               >
                 <View
