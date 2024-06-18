@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   ScrollView,
@@ -27,6 +28,7 @@ import { onValue, push, ref, set } from "firebase/database";
 import { ThemedView } from "@/components/ThemedView";
 import { Ionicons } from "@expo/vector-icons";
 import { Flag } from "@/constants/Flags";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
 
 export default function register() {
   const colorScheme = useColorScheme() ?? "light";
@@ -40,6 +42,7 @@ export default function register() {
   const [favouriteError, setFavouriteError] = useState("");
   const [dropdown, setDropdown] = useState(false);
   const [favourite, setFavourite] = useState("");
+  const [registerActivity, setRegisterActivity] = useState(false);
   const data = [
     "Albania",
     "Anglia",
@@ -97,6 +100,7 @@ export default function register() {
     password: string,
     favourite: string
   ) => {
+    setRegisterActivity(true);
     resetErrors();
     if (username.length == 0) {
       setUsernameError("Pole nie może być puste.");
@@ -127,6 +131,7 @@ export default function register() {
           setUsernameError("Nazwa użytkownika jest już zajęta.");
         }
       });
+      setRegisterActivity(false);
     });
     if (
       usernameError.length == 0 &&
@@ -139,6 +144,7 @@ export default function register() {
           updateProfile(userCredential.user, { displayName: username }).then(
             () => {
               const user = userCredential.user;
+              setRegisterActivity(false);
               resetInputs();
               resetErrors();
               set(ref(db, "users/" + username), {
@@ -175,35 +181,27 @@ export default function register() {
     }
   };
   return (
-    <ScrollView>
-      <View
+    <View
         style={[
           styles.container,
           {
             backgroundColor:
-              colorScheme === "light" ? Colors.grey : Colors.darkgrey,
-            height: dimensions.height,
+            colorScheme === "light" ? Colors.grey : Colors.darkgrey,
           },
         ]}
-      >
+        >
         <Image
-          source={require("../assets/images/logo_small.png")}
-          resizeMode="center"
-          style={{ margin: 50, height: "20%", width: "80%" }}
-        />
+              source={require("../assets/images/logo_small.png")}
+              resizeMode="center"
+              style={{ alignSelf: 'center', height: "20%", width: "80%", margin: 'auto' }}
+            />
+
+       
         <View style={{  width: "100%" }}>
           <ThemedText type="title" style={{ textAlign: "center" }}>
             Zarejestruj się
           </ThemedText>
-          <View
-            style={[
-              styles.separator,
-              {
-                backgroundColor:
-                  colorScheme === "light" ? Colors.darkgrey : Colors.grey,
-              },
-            ]}
-          ></View>
+          <ThemedSeparator style={{width: '90%'}} />
           <View style={styles.modalContent}>
             <ThemedText type="default">Nazwa użytkownika</ThemedText>
             <TextInput
@@ -313,7 +311,7 @@ export default function register() {
                   style={{
                     padding: 5,
                     height: 150,
-                    backgroundColor: "#666",
+                    backgroundColor: colorScheme=='light' ? Colors.white : "#666",
                     borderBottomLeftRadius: 5,
                     borderBottomRightRadius: 5,
                   }}
@@ -351,7 +349,10 @@ export default function register() {
             </View>
             <ThemedSeparator />
             <View >
-              <TouchableNativeFeedback
+              {registerActivity ? <View
+                  style={[styles.buttons, { backgroundColor: Colors.darkblue }]}
+                ><ThemedText type="subtitle" style={{ color: Colors.white }}>
+              <ActivityIndicator animating={true} color={Colors.white} /></ThemedText></View> : <TouchableNativeFeedback
                 onPress={() => {
                   register(username, email, password, favourite);
                 }}
@@ -363,7 +364,7 @@ export default function register() {
                     Zarejestruj się
                   </ThemedText>
                 </View>
-              </TouchableNativeFeedback>
+              </TouchableNativeFeedback>}
               <TouchableNativeFeedback onPress={() => router.back()}>
                 <View
                   style={[styles.buttons, { backgroundColor: Colors.orange }]}
@@ -377,7 +378,7 @@ export default function register() {
           </View>
         </View>
       </View>
-    </ScrollView>
+
   );
 }
 

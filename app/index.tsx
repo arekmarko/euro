@@ -8,7 +8,7 @@ import { Link, router } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { BackHandler, Image, Linking, Modal, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, useColorScheme, useWindowDimensions } from "react-native";
+import { ActivityIndicator, BackHandler, Image, Linking, Modal, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, useColorScheme, useWindowDimensions } from "react-native";
 
 type Version = {
   name: string;
@@ -19,6 +19,7 @@ export default function Index() {
   const colorScheme = useColorScheme() ?? 'light';
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [update, setUpdate] = useState(false);
+  const [loginActivity, setLoginActivity] = useState(true);
   const [version, setVersion] = useState<Version>({name: '1.0.1', link: ''});
   const currentVersion = '1.0.1';
   const onModalOpen = () => {
@@ -37,9 +38,11 @@ export default function Index() {
         } else {
           subscriber = auth.onAuthStateChanged(onAuthStateChanged);
         }
+        setLoginActivity(false);
       }
     );
     function onAuthStateChanged(user:any) {
+      setLoginActivity(false);
       if (user) {
         router.navigate('(tabs)');
       }
@@ -80,6 +83,12 @@ export default function Index() {
         resizeMode="center"
         style={styles.image}
       />
+      {loginActivity ? <View style={{flex: 1}}><LinearGradient
+          style={[styles.btnBackground, {paddingHorizontal: '20%'}]}
+          colors={[Colors.blue, Colors.purple]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 1 }}
+        ><ActivityIndicator animating={true} color={Colors.white} size={48} /></LinearGradient></View> :
       <TouchableOpacity
         onPress={() => {
           //router.navigate("(tabs)");
@@ -98,7 +107,7 @@ export default function Index() {
             Zaloguj się
           </ThemedText>
         </LinearGradient>
-      </TouchableOpacity>
+      </TouchableOpacity>}
       <ThemedView
         style={styles.greyBox}
         lightColor={Colors.grey}

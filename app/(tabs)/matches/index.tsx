@@ -1,4 +1,14 @@
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableNativeFeedback,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedView } from "@/components/ThemedView";
@@ -8,6 +18,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
 import { router } from "expo-router";
+import { Flag } from "@/constants/Flags";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Match = {
   id: number;
@@ -23,6 +35,7 @@ type Match = {
 };
 
 export default function matches() {
+  const colorScheme = useColorScheme() ?? "light";
   const [matches, setMatches] = useState<Match[]>([]);
   useEffect(() => {
     onValue(ref(db, "matches/"), (snapshot) => {
@@ -52,39 +65,117 @@ export default function matches() {
       <ThemedView style={styles.container}>
         <ThemedText type="title">Spotkania</ThemedText>
         {matches.length > 0 ? (
-        matches.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => {router.navigate('matches/' + (index+1))}}>
-          <ThemedView
-            lightColor={Colors.grey}
-            darkColor={Colors.darkgrey}
-            style={{ marginVertical: 10, borderRadius: 20, padding: 10 }}
-          >
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-            <ThemedText type="default">{item.Phase}</ThemedText>
-            <ThemedText type="light">{item.Stadium}</ThemedText>
-            </View>
-            <ThemedSeparator style={{ width: "100%" }} />
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 3 }}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <ThemedText type="subtitle"  style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.Home}</ThemedText>
-                <ThemedText type="subtitle" style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.HomeGoals}</ThemedText>
+          matches.map((item, index) => (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              key={index}
+              onPress={() => {
+                router.navigate("matches/" + (index + 1));
+              }}
+            >
+              <ThemedView
+                lightColor={
+                  parseInt(item.HomeGoals) >= 0 && parseInt(item.AwayGoals) >= 0
+                    ? "#bbb"
+                    : Colors.grey
+                }
+                darkColor={
+                  parseInt(item.HomeGoals) >= 0 && parseInt(item.AwayGoals) >= 0
+                    ? "#212121"
+                    : Colors.darkgrey
+                }
+                style={{ marginVertical: 10, borderRadius: 20, padding: 10 }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <ThemedText type="default">{item.Phase}</ThemedText>
+                  <ThemedText type="light">{item.Stadium}</ThemedText>
                 </View>
-                <ThemedSeparator darkColor="#555" lightColor='#dfdfdf' />
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <ThemedText type="subtitle" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.Away}</ThemedText>
-                <ThemedText type="subtitle" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.AwayGoals}</ThemedText>
+                <ThemedSeparator style={{ width: "100%" }} />
+                <View style={{ flexDirection: "row" }}>
+                  <View style={{ flex: 3 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontWeight:
+                            item.HomeGoals > item.AwayGoals ? "bold" : "normal",
+                        }}
+                      >
+                        {item.Home}
+                      </ThemedText>
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontWeight:
+                            item.HomeGoals > item.AwayGoals ? "bold" : "normal",
+                        }}
+                      >
+                        {item.HomeGoals}
+                      </ThemedText>
+                    </View>
+                    <ThemedSeparator darkColor="#555" lightColor="#dfdfdf" />
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontWeight:
+                            item.AwayGoals > item.HomeGoals ? "bold" : "normal",
+                        }}
+                      >
+                        {item.Away}
+                      </ThemedText>
+
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontWeight:
+                            item.AwayGoals > item.HomeGoals ? "bold" : "normal",
+                        }}
+                      >
+                        {item.AwayGoals}
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ThemedText numberOfLines={1} type="default">
+                      {item.Date}
+                    </ThemedText>
+                    <ThemedText type="default">{item.Hour}</ThemedText>
+                  </View>
                 </View>
-              </View>
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ThemedText type="default">{item.Date}</ThemedText>
-                <ThemedText type="default">{item.Hour}</ThemedText>
-              </View>
-            </View>
-          </ThemedView>
-          </TouchableOpacity>
-        ))) :
-        <ActivityIndicator animating={true} color={Colors.darkblue} size={"large"} />}
+              </ThemedView>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <ActivityIndicator
+            animating={true}
+            color={Colors.darkblue}
+            size={"large"}
+          />
+        )}
       </ThemedView>
     </ParallaxScrollView>
   );

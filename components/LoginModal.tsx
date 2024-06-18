@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   StyleSheet,
@@ -23,20 +24,24 @@ export default function LoginModal({ isVisible, onClose }: any) {
   const [errorCred, setErrorCred] = useState(false);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [loginActivity, setLoginActivity] = useState(false);
   const resetInputs = () => {
     setLogin("");
     setPassword("");
   };
   const signInEmail = (login: string, password: string) => {
+    setLoginActivity(true);
     signInWithEmailAndPassword(auth, login, password)
       .then((userCredential) => {
         const user = userCredential.user;
         resetInputs();
         onClose();
+        setLoginActivity(false);
         router.navigate("(tabs)");
       })
       .catch(() => {
         setErrorCred(true);
+        setLoginActivity(false);
       });
   };
   return (
@@ -107,6 +112,14 @@ export default function LoginModal({ isVisible, onClose }: any) {
             ) : (
               <></>
             )}
+            {loginActivity ? <View
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: Colors.darkblue,
+                  },
+                ]}
+              ><ActivityIndicator animating={true} color={Colors.white} size={36} /></View> :
             <TouchableNativeFeedback
               onPress={() => {
                 setErrorCred(false);
@@ -123,7 +136,7 @@ export default function LoginModal({ isVisible, onClose }: any) {
               >
                 <ThemedText type="subtitle" style={{color: Colors.white}}>Zaloguj się</ThemedText>
               </View>
-            </TouchableNativeFeedback>
+            </TouchableNativeFeedback>}
             <ThemedSeparator style={{width: '80%'}} />
             <Pressable
               style={{ margin: 10 }}

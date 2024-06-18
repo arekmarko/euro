@@ -16,14 +16,9 @@ export default function Tables() {
     const dbRef = ref(db, "groups/");
     onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
-      const newData = Object.keys(data).map((key) => ({
+      const newData = Object.keys(data).map((key, value) => ({
         ...data[key],
       }));
-      newData.map((item) => {
-        const teams = Object.keys(item.teams).map((key) => ({
-          ...item.teams[key],
-        }));
-      });
       setTable(newData);
     });
   }, []);

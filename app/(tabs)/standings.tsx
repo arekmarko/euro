@@ -1,4 +1,4 @@
-import { Image, View, Text, StyleSheet, ActivityIndicator, ImageBackground } from "react-native";
+import { Image, View, Text, StyleSheet, ActivityIndicator, ImageBackground, useColorScheme } from "react-native";
 import React, { useEffect, useState } from "react";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedView } from "@/components/ThemedView";
@@ -11,14 +11,15 @@ import { Flag } from "@/constants/Flags";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function standings() {
+  const colorScheme = useColorScheme();
   const [rankingData, setRankingData] = useState<string[]>([]);
   useEffect(() => {
-    onValue(query(ref(db, "users"), orderByChild("ranking")), (snapshot) => {
+    onValue(ref(db, "users"), (snapshot) => {
       const data = snapshot.val();
       const newData = Object.keys(data).map((key) => ({
         ...data[key],
       }));
-      newData.sort((a, b) => (a.ranking > b.ranking ? 1 : -1));
+      newData.sort((a, b) => (a.points > b.points ? -1 : 1));
       setRankingData(newData);
     });
   }, []);
@@ -56,7 +57,7 @@ export default function standings() {
                 <ThemedText
                   type="title"
                   numberOfLines={1}
-                  style={{flex: 1, textAlign: 'left', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
+                  style={{ textAlign: 'left', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
                   darkColor={
                     index === 0
                       ? Colors.yellow
@@ -78,8 +79,8 @@ export default function standings() {
                 >
                   {index + 1}.
                 </ThemedText>
-                <ImageBackground resizeMode="stretch" source={Flag[g.favourite]} style={{flex: 4}} >
-                  <LinearGradient colors={[Colors.darkgrey,  '#000a',  Colors.darkgrey]} start={{x: 0, y: 1}} end={{x: 1, y: 1}}>
+                <ImageBackground resizeMode="stretch" source={Flag[g.favourite]} style={{flex: 1}} >
+                  <LinearGradient colors={colorScheme=='light' ? [Colors.grey, '#fffa', Colors.grey] : [Colors.darkgrey,  '#000a',  Colors.darkgrey]} start={{x: 0, y: 1}} end={{x: 1, y: 1}}>
                 <ThemedText
                   type="title"
                   numberOfLines={1}
@@ -93,7 +94,7 @@ export default function standings() {
                 <ThemedText
                   type="title"
                   numberOfLines={1}
-                  style={{flex: 1, textAlign: 'right', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
+                  style={{ textAlign: 'right', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
                   darkColor={
                     index === 0
                       ? Colors.yellow

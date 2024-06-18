@@ -6,7 +6,7 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";

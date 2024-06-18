@@ -1,5 +1,6 @@
 import {
   BackHandler,
+  FlatList,
   Image,
   ImageBackground,
   Modal,
@@ -57,6 +58,7 @@ export default function matchDetails() {
   const [prediction, setPrediction] = useState<Predictions>();
   const [HomeSquad, setHomeSquad] = useState<Squad[]>([]);
   const [AwaySquad, setAwaySquad] = useState<Squad[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
   const today = new Date();
   const [squad, setSquad] = useState<Squad[]>([
     { kitNumber: 1, name: "Manuel", surname: "Neuer" },
@@ -121,6 +123,22 @@ export default function matchDetails() {
         }
       }
     );
+    onValue(ref(db, "typer/"), (snapshot) => {
+      const playersData = snapshot.val();
+      const playersList = [];
+      for (const playerId in playersData) {
+        const player = playersData[playerId];
+        if (playersData[playerId][id as string]) {
+          playersList.push({
+            name: playerId,
+            home: player[id as string].Home,
+            away: player[id as string].Away,
+            points: player[id as string].points,
+          });
+        }
+      }
+      setPredictions(playersList);
+    });
   }, []);
   return (
     <ParallaxScrollView
@@ -163,6 +181,7 @@ export default function matchDetails() {
                 />
               </View>
               <ThemedText
+                numberOfLines={1}
                 style={{
                   textAlign: "left",
                   fontWeight:
@@ -227,6 +246,7 @@ export default function matchDetails() {
                 />
               </View>
               <ThemedText
+                numberOfLines={1}
                 style={{
                   textAlign: "right",
                   fontWeight:
@@ -253,7 +273,8 @@ export default function matchDetails() {
               >
                 <View
                   style={{
-                    backgroundColor: Colors.darkgrey,
+                    backgroundColor:
+                      colorScheme == "light" ? Colors.grey : Colors.darkgrey,
                     width: "10%",
                     aspectRatio: 1 / 1,
                     borderRadius: 20,
@@ -300,31 +321,86 @@ export default function matchDetails() {
               </TouchableNativeFeedback>
             ) : (
               <View style={{ alignItems: "center" }}>
-                {prediction && prediction?.Home == match?.HomeGoals &&
+                {prediction &&
+                match?.HomeGoals &&
+                match.AwayGoals &&
+                prediction?.Home == match?.HomeGoals &&
                 prediction?.Away == match?.AwayGoals ? (
                   <ThemedText type="light">Dokładny wynik +1</ThemedText>
                 ) : (
                   <></>
                 )}
                 {prediction &&
-                match &&
-                prediction?.Home > prediction?.Away ==
-                  match?.HomeGoals > match?.AwayGoals ? (
+                match!.HomeGoals>=0 &&
+                match!.AwayGoals>=0 &&
+                ((prediction?.Home > prediction?.Away &&
+                  match!.HomeGoals > match!.AwayGoals) ||
+                  (prediction?.Home < prediction?.Away &&
+                    match!.HomeGoals < match!.AwayGoals) ||
+                  (prediction?.Home == prediction?.Away &&
+                    match?.HomeGoals == match?.AwayGoals)) ? (
                   <ThemedText type="light">Poprawny zwycięzca +1</ThemedText>
                 ) : (
                   <></>
                 )}
                 {prediction &&
-                match &&
-                prediction?.Home - prediction?.Away ==
+                match?.HomeGoals &&
+                match?.AwayGoals &&
+                prediction?.Home - prediction?.Away ===
                   match?.HomeGoals - match?.AwayGoals ? (
                   <ThemedText type="light">Różnica bramek +1</ThemedText>
                 ) : (
                   <></>
                 )}
-                {prediction ? <></> : <ThemedText style={{textAlign: 'center'}}>Nie można obstawić wyniku, ponieważ ten mecz już się odbył.</ThemedText>}
+                {prediction ? (
+                  <></>
+                ) : (
+                  <ThemedText style={{ textAlign: "center" }}>
+                    Nie można obstawić wyniku, ponieważ ten mecz już się odbył.
+                  </ThemedText>
+                )}
               </View>
             )}
+          </Collapsible>
+
+          <Collapsible title="Typowania innych">
+            {predictions
+              .sort((a, b) => (a.points > b.points ? -1 : 1))
+              .map((item: any, index: any) => (
+                <View key={index}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <ThemedText type="light" style={{ flex: 1 }}>
+                      {index + 1}. {item.name}
+                    </ThemedText>
+                    <ThemedText
+                      type="default"
+                      style={{ flex: 1, textAlign: "center" }}
+                    >
+                      {item.home} - {item.away}
+                    </ThemedText>
+                    {item.points >= 0 ? (
+                      <ThemedText
+                        type="light"
+                        style={{ flex: 1, textAlign: "right" }}
+                      >
+                        +{item.points}{" "}
+                        {item.points > 1
+                          ? "punkty"
+                          : item.points == 0
+                          ? "punktów"
+                          : "punkt"}
+                      </ThemedText>
+                    ) : (
+                      <></>
+                    )}
+                  </View>
+                  <ThemedSeparator
+                    style={{ margin: 0 }}
+                    lightColor={Colors.grey}
+                    darkColor={Colors.darkgrey}
+                  />
+                </View>
+              ))}
           </Collapsible>
 
           <Collapsible title="Składy">
@@ -358,22 +434,30 @@ export default function matchDetails() {
                           }}
                         >
                           <LinearGradient
-                            colors={["#000", "#0000"]}
+                            colors={
+                              colorScheme == "light"
+                                ? ["#fff", "#fff5"]
+                                : ["#000", "#0000"]
+                            }
                             style={{ width: "100%" }}
                             start={{ x: 0, y: 1 }}
                             end={{ x: 1, y: 1 }}
                           >
                             <ThemedText
+                              numberOfLines={1}
                               style={{
                                 textAlign: "right",
-                                transform: [{ translateX: -25 }],
+                                transform: [{ translateX: -20 }],
                               }}
                             >
                               {item.kitNumber}
                             </ThemedText>
                           </LinearGradient>
                         </ImageBackground>
-                        <ThemedText style={{ textAlign: "left", flex: 5 }}>
+                        <ThemedText
+                          numberOfLines={1}
+                          style={{ textAlign: "left", flex: 5 }}
+                        >
                           {item.name[0]}. {item.surname}
                         </ThemedText>
                       </View>
@@ -398,7 +482,10 @@ export default function matchDetails() {
                           justifyContent: "flex-end",
                         }}
                       >
-                        <ThemedText style={{ textAlign: "right", flex: 5 }}>
+                        <ThemedText
+                          numberOfLines={1}
+                          style={{ textAlign: "right", flex: 5 }}
+                        >
                           {item.name[0]}. {item.surname}
                         </ThemedText>
                         {/* <Image source={Flag[match?.Home as string]} resizeMode="center"  style={{width: '10%', height: '100%'}} /> */}
@@ -413,15 +500,20 @@ export default function matchDetails() {
                           }}
                         >
                           <LinearGradient
-                            colors={["#000", "#0000"]}
+                            colors={
+                              colorScheme == "light"
+                                ? ["#fff", "#fff5"]
+                                : ["#000", "#0000"]
+                            }
                             style={{ width: "100%" }}
                             start={{ x: 1, y: 1 }}
                             end={{ x: 0, y: 1 }}
                           >
                             <ThemedText
+                              numberOfLines={1}
                               style={{
                                 textAlign: "left",
-                                transform: [{ translateX: 25 }],
+                                transform: [{ translateX: 20 }],
                               }}
                             >
                               {item.kitNumber}
@@ -475,29 +567,34 @@ export default function matchDetails() {
             justifyContent: "center",
           }}
         ></Pressable>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-
-        <View
-          style={{
-            margin: 'auto',
-            padding: 20,
-            borderRadius: 20,
-            justifyContent: "center",
-            alignItems: "center",
-            alignSelf: "center",
-            width: "70%",
-            position: "absolute",
-            backgroundColor:
-            colorScheme === "light" ? Colors.grey : Colors.darkgrey,
-            gap: 15
-          }}
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <View
+            style={{
+              margin: "auto",
+              padding: 20,
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              alignSelf: "center",
+              width: "70%",
+              position: "absolute",
+              backgroundColor:
+                colorScheme === "light" ? Colors.grey : Colors.darkgrey,
+              gap: 15,
+            }}
           >
-          <ThemedText type="subtitle">Informacje</ThemedText>
-          <ThemedText type="default" style={{textAlign: 'center'}}>+1 punkt za wytypowanie idealnego wyniku.</ThemedText>
-          <ThemedText type="default" style={{textAlign: 'center'}}>+1 punkt za wytypowanie zwycięzcy spotkania.</ThemedText>
-          <ThemedText type="default" style={{textAlign: 'center'}}>+1 punkt za wytypowanie poprawnej różnicy bramek.</ThemedText>
-        </View>
+            <ThemedText type="subtitle">Informacje</ThemedText>
+            <ThemedText type="default" style={{ textAlign: "center" }}>
+              +1 punkt za wytypowanie idealnego wyniku.
+            </ThemedText>
+            <ThemedText type="default" style={{ textAlign: "center" }}>
+              +1 punkt za wytypowanie zwycięzcy spotkania.
+            </ThemedText>
+            <ThemedText type="default" style={{ textAlign: "center" }}>
+              +1 punkt za wytypowanie poprawnej różnicy bramek.
+            </ThemedText>
           </View>
+        </View>
       </Modal>
     </ParallaxScrollView>
   );
