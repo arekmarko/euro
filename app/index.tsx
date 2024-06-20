@@ -54,7 +54,7 @@ export default function Index() {
       <Modal animationType="fade"
         transparent={true}
         visible={update}
-        onRequestClose={() => BackHandler.exitApp()}
+        onRequestClose={() => setUpdate(false)}
         >
           <View style={{
             height: "100%",
@@ -68,8 +68,8 @@ export default function Index() {
             <ThemedText type="subtitle">Aktualizacja</ThemedText>
             <ThemedText type="default">Dostępna jest nowsza wersja aplikacji.</ThemedText>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '80%'}}>
-              <TouchableNativeFeedback onPress={() => BackHandler.exitApp()}>
-              <ThemedView darkColor="#777" style={{padding: 10, borderRadius: 10}}><ThemedText>Wyjdź</ThemedText></ThemedView>
+              <TouchableNativeFeedback onPress={() => setUpdate(false)}>
+              <ThemedView darkColor="#777" style={{padding: 10, borderRadius: 10}}><ThemedText>Później</ThemedText></ThemedView>
               </TouchableNativeFeedback>
               <TouchableNativeFeedback onPress={() => Linking.openURL(version.link)}>
               <ThemedView darkColor="#777" style={{padding: 10, borderRadius: 10}}><ThemedText>Pobierz</ThemedText></ThemedView>

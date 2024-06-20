@@ -8,7 +8,7 @@ import {
   View,
   useColorScheme,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import ScrollPicker from "react-native-wheel-scrollview-picker";
 import { ThemedText } from "./ThemedText";
@@ -70,7 +70,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
         <View style={{ flexDirection: "row", flex: 1, alignItems: 'center' }}>
           <View style={{flex: 1, alignItems: 'center'}}>
             <ThemedText type="subtitle" numberOfLines={1}>{match?.Home}</ThemedText>
-            <View style={{ height: "40%", width: 100, alignSelf: 'center' }}>
+            <View style={{ height: "60%", width: 100, alignSelf: 'center' }}>
               <ScrollPicker
                 dataSource={scoreSource}
                 selectedIndex={prediction.Home}
@@ -85,9 +85,9 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleHomePrediction(data);
                 }}
-                wrapperHeight={160}
-                wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
+                wrapperHeight={240}
                 itemHeight={70}
+                wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
                 highlightColor="#777"
                 highlightBorderWidth={2}
               />
@@ -95,7 +95,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
           </View>
           <View style={{flex: 1, alignItems: 'center'}}>
             <ThemedText type="subtitle" numberOfLines={1}>{match?.Away}</ThemedText>
-            <View style={{ height: "40%", width: 100, alignSelf: 'center' }}>
+            <View style={{ height: "60%", width: 100, alignSelf: 'center' }}>
               <ScrollPicker
                 dataSource={scoreSource}
                 selectedIndex={prediction.Away}
@@ -110,7 +110,7 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleAwayPrediction(data);
                 }}
-                wrapperHeight={160}
+                wrapperHeight={240}
                 wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
                 itemHeight={70}
                 highlightColor="#777"
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "80%",
-    height: "60%",
+    height: "80%",
     borderRadius: 10,
     padding: 20
   },

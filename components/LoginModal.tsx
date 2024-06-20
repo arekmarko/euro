@@ -137,9 +137,9 @@ export default function LoginModal({ isVisible, onClose }: any) {
                 <ThemedText type="subtitle" style={{color: Colors.white}}>Zaloguj się</ThemedText>
               </View>
             </TouchableNativeFeedback>}
-            <ThemedSeparator style={{width: '80%'}} />
+            <ThemedSeparator style={{margin: 10, width: '80%'}} />
             <Pressable
-              style={{ margin: 10 }}
+              style={{ margin: 0 }}
               onPress={() => {onClose(); router.navigate('register')}}
             >
               <ThemedText style={{ textAlign: "center" }} type="default">
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   titleContainer: {
-    padding: 15,
+    paddingTop: 10,
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
     paddingHorizontal: 20,
@@ -178,8 +178,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     flex: 1,
-    padding: 25,
-    gap: 10,
+    paddingHorizontal: '5%',
+    paddingBottom: 10,
+    gap: 5,
   },
   input: {
     borderRadius: 5,
@@ -194,7 +195,8 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
     padding: 10,
-    margin: 30,
+    margin: 15,
+    marginHorizontal: 30,
     alignItems: "center",
   },
 });

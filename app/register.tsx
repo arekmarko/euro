@@ -181,178 +181,179 @@ export default function register() {
     }
   };
   return (
-    <View
-        style={[
+    <ScrollView nestedScrollEnabled={true} style={{ flex: 1 }}>
+      <ThemedView style={[
           styles.container,
           {
             backgroundColor:
             colorScheme === "light" ? Colors.grey : Colors.darkgrey,
           },
-        ]}
-        >
-        <Image
-              source={require("../assets/images/logo_small.png")}
-              resizeMode="center"
-              style={{ alignSelf: 'center', height: "20%", width: "80%", margin: 'auto' }}
-            />
-
-       
-        <View style={{  width: "100%" }}>
-          <ThemedText type="title" style={{ textAlign: "center" }}>
-            Zarejestruj się
-          </ThemedText>
-          <ThemedSeparator style={{width: '90%'}} />
-          <View style={styles.modalContent}>
-            <ThemedText type="default">Nazwa użytkownika</ThemedText>
-            <TextInput
-              inputMode="text"
-              value={username}
-              onChangeText={setUsername}
-              maxLength={16}
-              textContentType="nickname"
-              style={[
-                styles.input,
-                {
+        ]}>
+        <View style={{ width: "80%", aspectRatio: 1 / 0.5 }}>
+          <Image
+            source={require("../assets/images/logo_small.png")}
+            resizeMode="center"
+            style={{ width: "100%", height: "100%" }}
+          />
+        </View>
+        <View style={styles.container}>
+          <ThemedText type="title" style={{textAlign: 'center'}}>Zarejestruj się</ThemedText>
+          <ThemedSeparator />
+          <ThemedText type="default" style={{margin: 5, marginTop: 10, textAlign: 'center'}}>Nazwa użytkownika</ThemedText>
+          <TextInput
+            inputMode="text"
+            value={username}
+            onChangeText={setUsername}
+            maxLength={16}
+            textContentType="nickname"
+            style={[
+              styles.input,
+              {
+                backgroundColor:
+                  colorScheme === "light" ? Colors.light.background : "#666",
+                color: colorScheme === "light" ? Colors.black : Colors.white,
+                borderColor: "red",
+                borderWidth: usernameError.length > 0 ? 1 : 0,
+              },
+            ]}
+          />
+          {usernameError.length > 0 ? (
+            <ThemedText type="error">{usernameError}</ThemedText>
+          ) : (
+            <></>
+          )}
+          <ThemedText type="default" style={{margin: 5, marginTop: 10}}>Email</ThemedText>
+          <TextInput
+            inputMode="email"
+            value={email}
+            onChangeText={setEmail}
+            autoComplete="email"
+            autoCapitalize="none"
+            maxLength={64}
+            textContentType="emailAddress"
+            style={[
+              styles.input,
+              {
+                backgroundColor:
+                  colorScheme === "light" ? Colors.light.background : "#666",
+                color: colorScheme === "light" ? Colors.black : Colors.white,
+                borderColor: "red",
+                borderWidth: emailError.length > 0 ? 1 : 0,
+              },
+            ]}
+          />
+          {emailError.length > 0 ? (
+            <ThemedText type="error">{emailError}</ThemedText>
+          ) : (
+            <></>
+          )}
+          <ThemedText type="default" style={{margin: 5, marginTop: 10}}>Hasło</ThemedText>
+          <TextInput
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword}
+            maxLength={64}
+            autoCapitalize="none"
+            textContentType="newPassword"
+            style={[
+              styles.input,
+              {
+                backgroundColor:
+                  colorScheme === "light" ? Colors.light.background : "#666",
+                color: colorScheme === "light" ? Colors.black : Colors.white,
+                borderColor: "red",
+                borderWidth: passwordError.length > 0 ? 1 : 0,
+              },
+            ]}
+          />
+          {passwordError.length > 0 ? (
+            <ThemedText type="error">{passwordError}</ThemedText>
+          ) : (
+            <></>
+          )}
+          <ThemedText type="default" style={{marginTop: 10, textAlign: 'center'}}>Twój faworyt turnieju</ThemedText>
+          <ThemedText type="light" style={{margin: 5, textAlign: 'center'}}>(Dodatkowe punkty za wytypowanie mistrza europy)</ThemedText>
+            <TouchableNativeFeedback onPress={handleDropdown}>
+              <ThemedView
+                style={{
+                  width: "100%",
+                  height: 40,
+                  borderRadius: 5,
+                  borderBottomLeftRadius: dropdown ? 0 : 5,
+                  borderBottomRightRadius: dropdown ? 0 : 5,
+                  borderBottomColor: Colors.white,
+                  borderColor: favouriteError ? "red" : Colors.darkblue,
+                  borderWidth: 1,
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 10,
+                  flexDirection: "row",
+                }}
+                lightColor={Colors.white}
+                darkColor="#666"
+              >
+                <ThemedText>{favourite}</ThemedText>
+                <Ionicons
+                  name="chevron-down"
+                  color={colorScheme === "light" ? Colors.black : Colors.white}
+                  size={18}
+                />
+              </ThemedView>
+            </TouchableNativeFeedback>
+            {dropdown ? (
+              <ScrollView
+              nestedScrollEnabled={true}
+                style={{
+                  padding: 5,
+                  width: '100%',
+                  height: 200,
                   backgroundColor:
-                    colorScheme === "light" ? Colors.light.background : "#666",
-                  color: colorScheme === "light" ? Colors.black : Colors.white,
-                  borderColor: "red",
-                  borderWidth: usernameError.length > 0 ? 1 : 0,
-                },
-              ]}
-            />
-            {usernameError.length > 0 ? (
-              <ThemedText type="error">{usernameError}</ThemedText>
-            ) : (
-              <></>
-            )}
-            <ThemedText type="default">Email</ThemedText>
-            <TextInput
-              inputMode="email"
-              value={email}
-              onChangeText={setEmail}
-              autoComplete="email"
-              autoCapitalize="none"
-              maxLength={64}
-              textContentType="emailAddress"
-              style={[
-                styles.input,
-                {
-                  backgroundColor:
-                    colorScheme === "light" ? Colors.light.background : "#666",
-                  color: colorScheme === "light" ? Colors.black : Colors.white,
-                  borderColor: "red",
-                  borderWidth: emailError.length > 0 ? 1 : 0,
-                },
-              ]}
-            />
-            {emailError.length > 0 ? (
-              <ThemedText type="error">{emailError}</ThemedText>
-            ) : (
-              <></>
-            )}
-            <ThemedText type="default">Hasło</ThemedText>
-            <TextInput
-              secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
-              maxLength={64}
-              autoCapitalize="none"
-              textContentType="newPassword"
-              style={[
-                styles.input,
-                {
-                  backgroundColor:
-                    colorScheme === "light" ? Colors.light.background : "#666",
-                  color: colorScheme === "light" ? Colors.black : Colors.white,
-                  borderColor: "red",
-                  borderWidth: passwordError.length > 0 ? 1 : 0,
-                },
-              ]}
-            />
-            {passwordError.length > 0 ? (
-              <ThemedText type="error">{passwordError}</ThemedText>
-            ) : (
-              <></>
-            )}
-            <ThemedText type="default">Twój faworyt turnieju</ThemedText>
-            <View>
-              <TouchableNativeFeedback onPress={handleDropdown}>
-                <ThemedView
-                  style={{
-                    width: "100%",
-                    height: 40,
-                    borderRadius: 5,
-                    borderBottomLeftRadius: dropdown ? 0 : 5,
-                    borderBottomRightRadius: dropdown ? 0 : 5,
-                    borderBottomColor: Colors.white,
-                    borderColor: favouriteError ? "red" : Colors.darkblue,
-                    borderWidth: 1,
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 10,
-                    flexDirection: "row",
-                  }}
-                  lightColor={Colors.white}
-                  darkColor="#666"
-                >
-                  <ThemedText>{favourite}</ThemedText>
-                  <Ionicons
-                    name="chevron-down"
-                    color={
-                      colorScheme === "light" ? Colors.black : Colors.white
-                    }
-                    size={18}
-                  />
-                </ThemedView>
-              </TouchableNativeFeedback>
-              {dropdown ? (
-                <ScrollView
-                  style={{
-                    padding: 5,
-                    height: 150,
-                    backgroundColor: colorScheme=='light' ? Colors.white : "#666",
-                    borderBottomLeftRadius: 5,
-                    borderBottomRightRadius: 5,
-                  }}
-                >
-                  {data.map((item, index) => (
-                    <View key={index}>
-                      <TouchableOpacity
-                        style={{ height: 40, justifyContent: "center" }}
-                        onPress={() => {
-                          setFavourite(item), handleDropdown();
-                        }}
-                      >
-                        <View style={{flexDirection: 'row'}}>
-
+                    colorScheme == "light" ? Colors.white : "#666",
+                  borderBottomLeftRadius: 5,
+                  borderBottomRightRadius: 5,
+                }}
+              >
+                {data.map((item, index) => (
+                  <View key={index}>
+                    <TouchableOpacity
+                      style={{ height: 40, justifyContent: "center" }}
+                      onPress={() => {
+                        setFavourite(item), handleDropdown();
+                      }}
+                    >
+                      <View style={{ flexDirection: "row" }}>
                         <Image
                           source={Flag[item]}
                           resizeMode="center"
-                          style={{height: '90%', width: 30}}
-                          />
-                          <ThemedText>{item}</ThemedText>
-                          </View>
-                      </TouchableOpacity>
-                      <ThemedSeparator style={{ margin: 3 }} />
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <></>
-              )}
-              {favouriteError.length > 0 ? (
-                <ThemedText type="error">{favouriteError}</ThemedText>
-              ) : (
-                <></>
-              )}
-            </View>
-            <ThemedSeparator />
-            <View >
-              {registerActivity ? <View
-                  style={[styles.buttons, { backgroundColor: Colors.darkblue }]}
-                ><ThemedText type="subtitle" style={{ color: Colors.white }}>
-              <ActivityIndicator animating={true} color={Colors.white} /></ThemedText></View> : <TouchableNativeFeedback
+                          style={{ height: "90%", width: 30 }}
+                        />
+                        <ThemedText>{item}</ThemedText>
+                      </View>
+                    </TouchableOpacity>
+                    <ThemedSeparator style={{ margin: 3 }} />
+                  </View>
+                ))}
+              </ScrollView>
+            ) : (
+              <></>
+            )}
+            {favouriteError.length > 0 ? (
+              <ThemedText type="error">{favouriteError}</ThemedText>
+            ) : (
+              <></>
+            )}
+          <ThemedSeparator style={{margin: 40}}/>
+          <View>
+            {registerActivity ? (
+              <View
+                style={[styles.buttons, { backgroundColor: Colors.darkblue }]}
+              >
+                <ThemedText type="subtitle" style={{ color: Colors.white }}>
+                  <ActivityIndicator animating={true} color={Colors.white} />
+                </ThemedText>
+              </View>
+            ) : (
+              <TouchableNativeFeedback
                 onPress={() => {
                   register(username, email, password, favourite);
                 }}
@@ -364,30 +365,230 @@ export default function register() {
                     Zarejestruj się
                   </ThemedText>
                 </View>
-              </TouchableNativeFeedback>}
-              <TouchableNativeFeedback onPress={() => router.back()}>
-                <View
-                  style={[styles.buttons, { backgroundColor: Colors.orange }]}
-                >
-                  <ThemedText type="subtitle" lightColor={Colors.white}>
-                    Anuluj
-                  </ThemedText>
-                </View>
               </TouchableNativeFeedback>
-            </View>
+            )}
+            <TouchableNativeFeedback onPress={() => router.back()}>
+              <View
+                style={[styles.buttons, { backgroundColor: Colors.orange }]}
+              >
+                <ThemedText type="subtitle" lightColor={Colors.white}>
+                  Anuluj
+                </ThemedText>
+              </View>
+            </TouchableNativeFeedback>
           </View>
         </View>
-      </View>
+      </ThemedView>
+    </ScrollView>
 
+    // <View
+    //     style={[
+    //       styles.container,
+    //       {
+    //         backgroundColor:
+    //         colorScheme === "light" ? Colors.grey : Colors.darkgrey,
+    //       },
+    //     ]}
+    //     >
+    //     <Image
+    //           source={require("../assets/images/logo_small.png")}
+    //           resizeMode="center"
+    //           style={{ alignSelf: 'center', height: "20%", width: "80%", margin: 'auto' }}
+    //         />
+
+    //     <View style={{  width: "100%" }}>
+    //       <ThemedText type="title" style={{ textAlign: "center" }}>
+    //         Zarejestruj się
+    //       </ThemedText>
+    //       <ThemedSeparator style={{width: '90%'}} />
+    //       <View style={styles.modalContent}>
+    //         <ThemedText type="default">Nazwa użytkownika</ThemedText>
+    //         <TextInput
+    //           inputMode="text"
+    //           value={username}
+    //           onChangeText={setUsername}
+    //           maxLength={16}
+    //           textContentType="nickname"
+    //           style={[
+    //             styles.input,
+    //             {
+    //               backgroundColor:
+    //                 colorScheme === "light" ? Colors.light.background : "#666",
+    //               color: colorScheme === "light" ? Colors.black : Colors.white,
+    //               borderColor: "red",
+    //               borderWidth: usernameError.length > 0 ? 1 : 0,
+    //             },
+    //           ]}
+    //         />
+    //         {usernameError.length > 0 ? (
+    //           <ThemedText type="error">{usernameError}</ThemedText>
+    //         ) : (
+    //           <></>
+    //         )}
+    //         <ThemedText type="default">Email</ThemedText>
+    //         <TextInput
+    //           inputMode="email"
+    //           value={email}
+    //           onChangeText={setEmail}
+    //           autoComplete="email"
+    //           autoCapitalize="none"
+    //           maxLength={64}
+    //           textContentType="emailAddress"
+    //           style={[
+    //             styles.input,
+    //             {
+    //               backgroundColor:
+    //                 colorScheme === "light" ? Colors.light.background : "#666",
+    //               color: colorScheme === "light" ? Colors.black : Colors.white,
+    //               borderColor: "red",
+    //               borderWidth: emailError.length > 0 ? 1 : 0,
+    //             },
+    //           ]}
+    //         />
+    //         {emailError.length > 0 ? (
+    //           <ThemedText type="error">{emailError}</ThemedText>
+    //         ) : (
+    //           <></>
+    //         )}
+    //         <ThemedText type="default">Hasło</ThemedText>
+    //         <TextInput
+    //           secureTextEntry={true}
+    //           value={password}
+    //           onChangeText={setPassword}
+    //           maxLength={64}
+    //           autoCapitalize="none"
+    //           textContentType="newPassword"
+    //           style={[
+    //             styles.input,
+    //             {
+    //               backgroundColor:
+    //                 colorScheme === "light" ? Colors.light.background : "#666",
+    //               color: colorScheme === "light" ? Colors.black : Colors.white,
+    //               borderColor: "red",
+    //               borderWidth: passwordError.length > 0 ? 1 : 0,
+    //             },
+    //           ]}
+    //         />
+    //         {passwordError.length > 0 ? (
+    //           <ThemedText type="error">{passwordError}</ThemedText>
+    //         ) : (
+    //           <></>
+    //         )}
+    //         <ThemedText type="default">Twój faworyt turnieju</ThemedText>
+    //         <View>
+    //           <TouchableNativeFeedback onPress={handleDropdown}>
+    //             <ThemedView
+    //               style={{
+    //                 width: "100%",
+    //                 height: 40,
+    //                 borderRadius: 5,
+    //                 borderBottomLeftRadius: dropdown ? 0 : 5,
+    //                 borderBottomRightRadius: dropdown ? 0 : 5,
+    //                 borderBottomColor: Colors.white,
+    //                 borderColor: favouriteError ? "red" : Colors.darkblue,
+    //                 borderWidth: 1,
+    //                 justifyContent: "space-between",
+    //                 alignItems: "center",
+    //                 paddingHorizontal: 10,
+    //                 flexDirection: "row",
+    //               }}
+    //               lightColor={Colors.white}
+    //               darkColor="#666"
+    //             >
+    //               <ThemedText>{favourite}</ThemedText>
+    //               <Ionicons
+    //                 name="chevron-down"
+    //                 color={
+    //                   colorScheme === "light" ? Colors.black : Colors.white
+    //                 }
+    //                 size={18}
+    //               />
+    //             </ThemedView>
+    //           </TouchableNativeFeedback>
+    //           {dropdown ? (
+    //             <ScrollView
+    //               style={{
+    //                 padding: 5,
+    //                 height: 150,
+    //                 backgroundColor: colorScheme=='light' ? Colors.white : "#666",
+    //                 borderBottomLeftRadius: 5,
+    //                 borderBottomRightRadius: 5,
+    //               }}
+    //             >
+    //               {data.map((item, index) => (
+    //                 <View key={index}>
+    //                   <TouchableOpacity
+    //                     style={{ height: 40, justifyContent: "center" }}
+    //                     onPress={() => {
+    //                       setFavourite(item), handleDropdown();
+    //                     }}
+    //                   >
+    //                     <View style={{flexDirection: 'row'}}>
+
+    //                     <Image
+    //                       source={Flag[item]}
+    //                       resizeMode="center"
+    //                       style={{height: '90%', width: 30}}
+    //                       />
+    //                       <ThemedText>{item}</ThemedText>
+    //                       </View>
+    //                   </TouchableOpacity>
+    //                   <ThemedSeparator style={{ margin: 3 }} />
+    //                 </View>
+    //               ))}
+    //             </ScrollView>
+    //           ) : (
+    //             <></>
+    //           )}
+    //           {favouriteError.length > 0 ? (
+    //             <ThemedText type="error">{favouriteError}</ThemedText>
+    //           ) : (
+    //             <></>
+    //           )}
+    //         </View>
+    //         <ThemedSeparator />
+    //         <View >
+    //           {registerActivity ? <View
+    //               style={[styles.buttons, { backgroundColor: Colors.darkblue }]}
+    //             ><ThemedText type="subtitle" style={{ color: Colors.white }}>
+    //           <ActivityIndicator animating={true} color={Colors.white} /></ThemedText></View> : <TouchableNativeFeedback
+    //             onPress={() => {
+    //               register(username, email, password, favourite);
+    //             }}
+    //           >
+    //             <View
+    //               style={[styles.buttons, { backgroundColor: Colors.darkblue }]}
+    //             >
+    //               <ThemedText type="subtitle" style={{ color: Colors.white }}>
+    //                 Zarejestruj się
+    //               </ThemedText>
+    //             </View>
+    //           </TouchableNativeFeedback>}
+    //           <TouchableNativeFeedback onPress={() => router.back()}>
+    //             <View
+    //               style={[styles.buttons, { backgroundColor: Colors.orange }]}
+    //             >
+    //               <ThemedText type="subtitle" lightColor={Colors.white}>
+    //                 Anuluj
+    //               </ThemedText>
+    //             </View>
+    //           </TouchableNativeFeedback>
+    //         </View>
+    //       </View>
+    //     </View>
+    //   </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
     paddingTop: "5%",
+    paddingHorizontal: 10
   },
   separator: {
     width: "90%",

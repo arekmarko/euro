@@ -42,9 +42,9 @@ export default function standings() {
         <ThemedText type="title">Ranking</ThemedText>
       <ThemedView style={{borderRadius: 20, padding: 20, paddingBottom: 30}} darkColor={Colors.darkgrey} lightColor={Colors.grey}>
         <View style={{flexDirection: 'row'}}>
-        <ThemedText style={{flex: 1, textAlign: 'left'}} type="subtitle">Lp.</ThemedText>
-        <ThemedText style={{flex: 1, textAlign: 'center'}} type="subtitle">Gracz</ThemedText>
-        <ThemedText style={{flex: 1, textAlign: 'right'}} type="subtitle">Punkty</ThemedText>
+        <ThemedText style={{flex: 1, textAlign: 'left'}} type="subtitle" numberOfLines={1}>Lp.</ThemedText>
+        <ThemedText style={{flex: 1, textAlign: 'center'}} type="subtitle" numberOfLines={1}>Gracz</ThemedText>
+        <ThemedText style={{flex: 1, textAlign: 'right'}} type="subtitle" numberOfLines={1}>Punkty</ThemedText>
         </View>
         <ThemedSeparator />
         {rankingData.length > 0 ? (
@@ -53,9 +53,9 @@ export default function standings() {
             <View
               key={index}
             >
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", alignItems: 'center' }}>
                 <ThemedText
-                  type="title"
+                  type="subtitle"
                   numberOfLines={1}
                   style={{ textAlign: 'left', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
                   darkColor={
@@ -82,7 +82,7 @@ export default function standings() {
                 <ImageBackground resizeMode="stretch" source={Flag[g.favourite]} style={{flex: 1}} >
                   <LinearGradient colors={colorScheme=='light' ? [Colors.grey, '#fffa', Colors.grey] : [Colors.darkgrey,  '#000a',  Colors.darkgrey]} start={{x: 0, y: 1}} end={{x: 1, y: 1}}>
                 <ThemedText
-                  type="title"
+                  type="subtitle"
                   numberOfLines={1}
                   style={{flex: 3, textAlign: 'center', textAlignVertical: 'center', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
                   
@@ -92,7 +92,7 @@ export default function standings() {
                     </LinearGradient>
                   </ImageBackground>
                 <ThemedText
-                  type="title"
+                  type="subtitle"
                   numberOfLines={1}
                   style={{ textAlign: 'right', fontWeight: auth.currentUser?.displayName==g.username ? 'bold' : 'normal'}}
                   darkColor={

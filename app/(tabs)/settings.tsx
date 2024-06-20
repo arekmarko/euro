@@ -36,13 +36,19 @@ type Match = {
   Matchday: number;
   Phase: string;
   Stadium: string;
-  HomeGoals: string;
-  AwayGoals: string;
+  HomeGoals: number;
+  AwayGoals: number;
 };
 
 type Predictions = {
   Home: number;
   Away: number;
+};
+
+type Squad = {
+  name: string;
+  surname: string;
+  kitNumber: number;
 };
 
 export default function Settings() {
@@ -60,8 +66,41 @@ export default function Settings() {
     Away: 0,
   });
   const [playersPrediction, setPlayerPrediction] = useState<any[]>([]);
+  const [squad, setSquad] = useState<Squad[]>(
+    [
+      { kitNumber: 1, name: "Yann", surname: "Sommer" },
+      { kitNumber: 2, name: "Leonidas", surname: "Stergiou" },
+      { kitNumber: 3, name: "Silvan", surname: "Widmer" },
+      { kitNumber: 4, name: "Nico", surname: "Elvedi" },
+      { kitNumber: 5, name: "Manuel", surname: "Akanji" },
+      { kitNumber: 6, name: "Denis", surname: "Zakaria" },
+      { kitNumber: 7, name: "Breel", surname: "Embolo" },
+      { kitNumber: 8, name: "Remo", surname: "Freuler" },
+      { kitNumber: 9, name: "Noah", surname: "Okafor" },
+      { kitNumber: 10, name: "Granit", surname: "Xhaka" },
+      { kitNumber: 11, name: "Renato", surname: "Steffen" },
+      { kitNumber: 12, name: "Yvon", surname: "Mvogo" },
+      { kitNumber: 13, name: "Ricardo", surname: "Rodriguez" },
+      { kitNumber: 14, name: "Steven", surname: "Zuber" },
+      { kitNumber: 15, name: "Cédric", surname: "Zesiger" },
+      { kitNumber: 16, name: "Vincent", surname: "Sierro" },
+      { kitNumber: 17, name: "Ruben", surname: "Vargas" },
+      { kitNumber: 18, name: "Kwadwo", surname: "Duah" },
+      { kitNumber: 19, name: "Dan", surname: "Ndoye" },
+      { kitNumber: 20, name: "Michel", surname: "Aebischer" },
+      { kitNumber: 21, name: "Gregor", surname: "Kobel" },
+      { kitNumber: 22, name: "Fabian", surname: "Schär" },
+      { kitNumber: 23, name: "Xherdan", surname: "Shaqiri" },
+      { kitNumber: 24, name: "Ardon", surname: "Jashari" },
+      { kitNumber: 25, name: "Zeki", surname: "Amdouni" },
+      { kitNumber: 26, name: "Fabian", surname: "Rieder" }
+  ]
+
+);
+  
   const scoreSource = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   useEffect(() => {
+    //set(ref(db, 'nations/Szwajcaria/'), {squad});
     onValue(ref(db, "matches/"), (snapshot) => {
       const data = snapshot.val();
       const newData = Object.keys(data).map((key) => ({
@@ -94,74 +133,86 @@ export default function Settings() {
     push(ref(db, "messages/" + auth.currentUser?.displayName + "/"), {
       message: message,
     });
+    setVisibleMessage(false);
+    ToastAndroid.show(
+      "Wysłano wiadomość.",
+      ToastAndroid.LONG
+    );
   }
-  function checkPoints(player: Predictions): number {
+  function checkPoints(player: Predictions, match: any): number {
     var points = 0;
+    //console.log(player.Home + '-' + player.Away + ' / wynik: ' + match.Home + ' ' + match.HomeGoals + '-' + match.AwayGoals + ' ' + match.Away)
     //punkty za poprawnego zwycięzcę
     if (
-      (player.Home > player.Away && prediction.Home > prediction.Away) ||
-      (player.Home < player.Away && prediction.Home < prediction.Away) ||
-      (player.Home == player.Away && prediction.Home == prediction.Away)
+      (player.Home > player.Away && match.HomeGoals > match.AwayGoals) ||
+      (player.Home < player.Away && match.HomeGoals < match.AwayGoals) ||
+      (player.Home == player.Away && match.HomeGoals == match.AwayGoals)
     ) {
+      //console.log('zwyciezca')
       points++;
     }
     //punkty za różnicę bramek
-    if (player.Home - player.Away === prediction.Home - prediction.Away) {
+    if (player.Home - player.Away === match.HomeGoals - match.AwayGoals) {
       //console.log(player.Home + ' - ' + player.Away + ' = ' + prediction.Home + ' - ' + prediction.Away)
+      //console.log('roznica bramek')
       points++;
     }
     //punkty za dokładny wynik
-    if (player.Home === prediction.Home && player.Away === prediction.Away) {
+    if (player.Home === match.HomeGoals && player.Away === match.AwayGoals) {
+      //console.log('dokladny wynik')
       points++;
     }
     return points;
   }
   function saveResult() {
+    console.log(matches[selectedMatch].Home + ' ' + prediction.Home + ' - ' + prediction.Away + ' ' + matches[selectedMatch].Away)
     update(ref(db, "matches/" + (selectedMatch + 1) + "/"), {
       HomeGoals: prediction.Home,
       AwayGoals: prediction.Away,
-    }).then(() => {
-      onValue(ref(db, "typer/"), (snapshot) => {
-        const playersData = snapshot.val();
-        for (const playerId in playersData) {
-          let tmpPoints = 0;
-          if (playersData[playerId][selectedMatch + 1]) {
-            const points = checkPoints(
-              playersData[playerId][selectedMatch + 1]
-            );
-            set(ref(db, "typer/" + playerId + "/" + (selectedMatch + 1) + "/"),
-              { ...playersData[playerId][selectedMatch + 1], points: points }
-            ).then(() => {
-              for (let i = 0; i <= selectedMatch + 1; i++) {
-                if (playersData[playerId][i] != undefined) {
-                  tmpPoints += playersData[playerId][i].points;
-                }
-              }
-              console.log(playerId + ": " + tmpPoints);
-              users[playerId as any].points = tmpPoints;
-              update(ref(db, "users/" + playerId + "/"), { points: tmpPoints });
-            });
+    })
+    onValue(ref(db, "typer/"), (snapshot) => {
+      const playersData = snapshot.val();
+      for (const playerId in playersData){
+        let tmpPoints = 0;
+        for (let i = 0; i <= selectedMatch + 1; i++) {
+        if (playersData[playerId][i]) {
+          if (i == selectedMatch + 1) {
+            const tmpMatch = {HomeGoals: prediction.Home, AwayGoals: prediction.Away}
+            const points = checkPoints(playersData[playerId][i], tmpMatch);
+            playersData[playerId][i].points = points;
+          } else {
+            const points = checkPoints(playersData[playerId][i], matches[i-1]);
+            playersData[playerId][i].points = points;
           }
         }
-        console.log("poza for");
-        const newData = Object.keys(users).map((key: any) => ({
-          ...users[key],
-        }));
-        newData
-          .sort((a: any, b: any) => (a.points > b.points ? -1 : 1))
-          .map((value: any, index: any) =>
-            update(ref(db, "users/" + value.username + "/"), {
-              ranking: index + 1,
-            })
-          );
+      }
+        for (let i = 0; i <= selectedMatch + 1; i++) {
+          if (playersData[playerId][i] != undefined) {
+            tmpPoints = tmpPoints + playersData[playerId][i].points;
+          }
+        }
+        users[playerId as any].points = tmpPoints;
+      }
+      Object.keys(users).map((key: any) => ({
+        ...users[key],
+      }))
+        .sort((a: any, b: any) => (a.points > b.points ? -1 : 1))
+        .map((value: any, index: any) =>
+          users[value.username].ranking = index+1
+        );
+        set(ref(db, 'typer/'), {
+          ...playersData
+        })
+        set(ref(db, 'users/'), {
+          ...users
+        })
         ToastAndroid.show(
           "Dodano wynik " + prediction.Home + "-" + prediction.Away,
           ToastAndroid.LONG
         );
-        console.log("------------");
-      });
-    });
+    })
   }
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{
@@ -229,7 +280,9 @@ export default function Settings() {
           <ThemedView
             style={{
               width: "80%",
-              backgroundColor: Colors.darkgrey,
+              backgroundColor: colorScheme == "light"
+                    ? Colors.grey
+                    : Colors.darkgrey,
               gap: 20,
               padding: 20,
               borderRadius: 20,
@@ -242,7 +295,7 @@ export default function Settings() {
               value={message}
               onChangeText={setMessage}
               style={{
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.white,
                 width: "100%",
                 textAlignVertical: "top",
                 padding: 3,
@@ -253,7 +306,7 @@ export default function Settings() {
             />
             <TouchableNativeFeedback onPress={() => sendMessage()}>
               <ThemedView
-                lightColor={Colors.grey}
+                lightColor='#ccc'
                 darkColor="#777"
                 style={styles.button}
               >
@@ -273,7 +326,7 @@ export default function Settings() {
           darkColor={Colors.darkgrey}
           style={styles.logoutButton}
         >
-          <ThemedText type="subtitle">Wyloguj się</ThemedText>
+          <ThemedText type="subtitle" style={{textAlign: 'center'}}>Wyloguj się</ThemedText>
         </ThemedView>
       </TouchableNativeFeedback>
       <Modal
@@ -288,7 +341,7 @@ export default function Settings() {
           <ThemedView
             style={{
               width: "80%",
-              height: "80%",
+              height: "60%",
               padding: 20,
               justifyContent: "center",
               alignItems: "center",
@@ -317,6 +370,7 @@ export default function Settings() {
               >
                 {selectedMatch >= 0 ? (
                   <ThemedText>
+                    {selectedMatch+1 + '. '}
                     {matches[selectedMatch]?.Home} -{" "}
                     {matches[selectedMatch]?.Away}
                   </ThemedText>
@@ -351,6 +405,7 @@ export default function Settings() {
                         }}
                       >
                         <View style={{ flexDirection: "row" }}>
+                          <ThemedText type="subtitle">{index+1}. </ThemedText>
                           <ThemedText type="subtitle" style={{ flex: 1 }}>
                             {value?.Home}
                           </ThemedText>
@@ -489,7 +544,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     alignItems: "center",
-    width: "50%",
+    width: "70%",
     margin: 20,
   },
   button: {

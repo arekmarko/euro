@@ -20,7 +20,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { auth, db } from "@/firebaseConfig";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import { limitToFirst, onValue, query, ref } from "firebase/database";
 import Table from "@/components/Table";
@@ -56,9 +56,27 @@ export default function HomeScreen() {
     points: 0,
     ranking: 0
   });
+  const scrollRef = useRef<FlatList>(null);
+  const [initIndex, setInitIndex] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
   const routers = useNavigation();
   const dimensions = useWindowDimensions();
+  const today = new Date();
+  function beforeMatch(date: any) {
+    if (
+      (parseInt(date?.Date.split(".")[0] as string) > today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) >= today.getMonth() + 1) ||
+      parseInt(date?.Date.split(".")[1] as string) > today.getMonth() + 1 ||
+      (parseInt(date?.Date.split(".")[0] as string) == today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) == today.getMonth() + 1 &&
+        parseInt(date?.Hour.split(":")[0] as string) > today.getHours())
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   useEffect(() => {
     onValue(
       ref(db, "users/" + auth.currentUser?.displayName + "/"),
@@ -188,7 +206,7 @@ export default function HomeScreen() {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               activeOpacity={0.7}
-              //onPress={() => {router.navigate('matches/' + item.id.toString())}}
+              //onPress={() => {router.push('matches/' + item.id)}}
             >
               <ThemedView
                 lightColor={Colors.grey}
@@ -197,12 +215,12 @@ export default function HomeScreen() {
               >
                 <View style={{ flexDirection: "row" }}>
                   <View style={{ flex: 1, paddingHorizontal: 3 }}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', gap: 10}}>
                     <ThemedText type="default" style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.Home}</ThemedText>
                     <ThemedText type="default" style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.HomeGoals}</ThemedText>
                     </View>
                     <ThemedSeparator style={{ marginVertical: 2 }} />
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', gap: 10}}>
                     <ThemedText type="default" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.Away}</ThemedText>
                     <ThemedText type="default" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.AwayGoals}</ThemedText>
                     </View>                  

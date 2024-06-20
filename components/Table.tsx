@@ -1,4 +1,5 @@
 import {
+  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -6,7 +7,7 @@ import {
   useColorScheme,
   useWindowDimensions,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,7 +16,16 @@ import { Flag } from "@/constants/Flags";
 
 export default function Table({ g, index, style }: any) {
   const colorScheme = useColorScheme() ?? "light";
+  const [teams, setTeams] = useState<any[]>([]);
   const dimensions = useWindowDimensions();
+  useEffect(() => {
+    const newData = Object.keys(g.teams).map((key,value) => ({
+      ...g.teams[key]
+    }))
+    newData.sort((a:any,b:any) => (a.gs > b.gs ? -1:1))
+    newData.sort((a:any,b:any) => (a.wins*3+a.draws > b.wins*3+b.draws ? -1 : 1))
+    setTeams(newData);
+  }, []);
   return (
     <LinearGradient
       style={[style, { borderRadius: 20, flex: 1 }]}
@@ -64,37 +74,35 @@ export default function Table({ g, index, style }: any) {
           </ThemedText>
         </View>
         <ThemedSeparator style={{margin: 0}} darkColor={Colors.yellow} />
-        {Object.keys(g.teams).map((key, index) => (
-          <View key={key} style={styles.tableTeam}>
-            <View style={{ flex: 5, flexDirection: "row" }}>
-              <ThemedText type="default" numberOfLines={1} style={{flex: 3, textAlign: 'right'}} >
-                {index + 1}.
-              </ThemedText>
-              <Image
-                source={Flag[g.teams[key].name] ? Flag[g.teams[key].name] : require("../assets/images/flags/polska.png")}
+        {teams.map((item, index) => (
+          <View key={index} style={styles.tableTeam}>
+            <View style={{flex:5, flexDirection: 'row'}}>
+            <ThemedText style={{flex:2, textAlign:'right'}}>{index+1}.</ThemedText>
+            <Image
+                source={Flag[item.name] ? Flag[item.name] : require("../assets/images/flags/polska.png")}
                 resizeMode="center"
-                style={{flex:3, height: '100%', margin: 2, alignSelf: 'center' }}
+                style={{flex:2, height: '100%', margin: 2, alignSelf: 'center' }}
               />
               <ThemedText type="defaultSemiBold" numberOfLines={1} style={{flex: 10}}>
-                {g.teams[key].name}
+                {item.name}
               </ThemedText>
             </View>
             <ThemedText style={styles.tableText} type="default">
-              {g.teams[key].wins >= 0 ? g.teams[key].wins : 0}
+              {item.wins >= 0 ? item.wins : 0}
             </ThemedText>
             <ThemedText style={styles.tableText} type="default">
-              {g.teams[key].draws >= 0 ? g.teams[key].draws : 0}
+              {item.draws >= 0 ? item.draws : 0}
             </ThemedText>
             <ThemedText style={styles.tableText} type="default">
-              {g.teams[key].loses >= 0 ? g.teams[key].loses : 0}
+              {item.loses >= 0 ? item.loses : 0}
             </ThemedText>
             <ThemedText
               style={{ flex: 2, textAlign: "center" }}
               type="default"
               numberOfLines={1}
             >
-              {g.teams[key].gs >= 0 || g.teams[key].gs >= 0
-                ? g.teams[key].gs + ":" + g.teams[key].gc
+              {item.gs >= 0 || item.gs >= 0
+                ? item.gs + ":" + item.gc
                 : "0:0"}
             </ThemedText>
             <ThemedText
@@ -102,12 +110,12 @@ export default function Table({ g, index, style }: any) {
               type="defaultSemiBold"
               numberOfLines={1}
             >
-              {g.teams[key].wins >= 0 || g.teams[key].draws >= 0
-                ? g.teams[key].wins * 3 + g.teams[key].draws
+              {item.wins >= 0 || item.draws >= 0
+                ? item.wins * 3 + item.draws
                 : 0}
             </ThemedText>
-          </View>
-        ))}
+            </View>
+            ))}
       </View>
     </LinearGradient>
   );

@@ -4,7 +4,7 @@
     "slug": "euro",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/euroicon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/euroicon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.arekmarko8.euro"

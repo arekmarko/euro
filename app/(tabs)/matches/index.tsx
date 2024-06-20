@@ -1,7 +1,9 @@
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   ImageBackground,
+  LogBox,
   StyleSheet,
   Text,
   TouchableNativeFeedback,
@@ -9,7 +11,7 @@ import {
   View,
   useColorScheme,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedView } from "@/components/ThemedView";
 import { onValue, ref } from "firebase/database";
@@ -17,7 +19,7 @@ import { auth, db } from "@/firebaseConfig";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Flag } from "@/constants/Flags";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -36,7 +38,24 @@ type Match = {
 
 export default function matches() {
   const colorScheme = useColorScheme() ?? "light";
+  const scrollRef = useRef<FlatList>(null);
   const [matches, setMatches] = useState<Match[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const today = new Date();
+  function beforeMatch(date: any) {
+    if (
+      (parseInt(date?.Date.split(".")[0] as string) > today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) >= today.getMonth() + 1) ||
+      parseInt(date?.Date.split(".")[1] as string) > today.getMonth() + 1 ||
+      (parseInt(date?.Date.split(".")[0] as string) == today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) == today.getMonth() + 1 &&
+        parseInt(date?.Hour.split(":")[0] as string) > today.getHours())
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   useEffect(() => {
     onValue(ref(db, "matches/"), (snapshot) => {
       const data = snapshot.val();
@@ -45,6 +64,13 @@ export default function matches() {
       }));
       setMatches(newData);
     });
+    onValue(
+      ref(db, "typer/" + auth.currentUser?.displayName + "/"),
+      (snapshot) => {
+        const data = snapshot.val();
+        setPredictions(data);
+      }
+    );
   }, []);
   return (
     <ParallaxScrollView
@@ -65,8 +91,9 @@ export default function matches() {
       <ThemedView style={styles.container}>
         <ThemedText type="title">Spotkania</ThemedText>
         {matches.length > 0 ? (
-          matches.map((item, index) => (
+          matches.map((item: any, index: any) => (
             <TouchableOpacity
+              ref={(r) => scrollRef}
               activeOpacity={0.7}
               key={index}
               onPress={() => {
@@ -84,7 +111,16 @@ export default function matches() {
                     ? "#212121"
                     : Colors.darkgrey
                 }
-                style={{ marginVertical: 10, borderRadius: 20, padding: 10 }}
+                style={{
+                  marginVertical: 10,
+                  borderRadius: 20,
+                  padding: 10,
+                  opacity:
+                    parseInt(item.HomeGoals) >= 0 &&
+                    parseInt(item.AwayGoals) >= 0
+                      ? 0.7
+                      : 1,
+                }}
               >
                 <View
                   style={{
@@ -105,18 +141,56 @@ export default function matches() {
                         justifyContent: "space-between",
                       }}
                     >
+                      <View style={{ flex: 1, flexDirection: "row" }}>
+                        <ImageBackground
+                          source={Flag[item.Home as string]}
+                          resizeMode={
+                            item.Away == "Szwajcaria" ? "center" : "stretch"
+                          }
+                          imageStyle={{ height: "100%", width: "100%" }}
+                          style={{
+                            aspectRatio: 1.5/1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <LinearGradient
+                            colors={
+                              colorScheme == "light"
+                                ? parseInt(item.HomeGoals) >= 0 &&
+                                  parseInt(item.AwayGoals) >= 0
+                                  ? ["#bbb", "#bbb0"]
+                                  : ["#eaeaea", "#eaeaea00"]
+                                : parseInt(item.HomeGoals) >= 0 &&
+                                  parseInt(item.AwayGoals) >= 0
+                                ? ["#212121", "#21212100"]
+                                : ["#333", "#3330"]
+                            }
+                            style={{ width: "100%" }}
+                            start={{ x: 1, y: 1 }}
+                            end={{ x: 0, y: 1 }}
+                          >
+                            <ThemedText type="subtitle"></ThemedText>
+                          </LinearGradient>
+                        </ImageBackground>
+                        <ThemedText
+                          type="subtitle"
+                          numberOfLines={1}
+                          style={{
+                            flex:1,
+                            fontWeight:
+                              item.HomeGoals > item.AwayGoals
+                                ? "bold"
+                                : "normal",
+                          }}
+                        >
+                          {item.Home}
+                        </ThemedText>
+                      </View>
                       <ThemedText
                         type="subtitle"
                         style={{
-                          fontWeight:
-                            item.HomeGoals > item.AwayGoals ? "bold" : "normal",
-                        }}
-                      >
-                        {item.Home}
-                      </ThemedText>
-                      <ThemedText
-                        type="subtitle"
-                        style={{
+                          marginLeft: 5,
                           fontWeight:
                             item.HomeGoals > item.AwayGoals ? "bold" : "normal",
                         }}
@@ -132,19 +206,56 @@ export default function matches() {
                         justifyContent: "space-between",
                       }}
                     >
+                      <View style={{ flex: 1, flexDirection: "row" }}>
+                        <ImageBackground
+                          source={Flag[item.Away as string]}
+                          resizeMode={
+                            item.Away == "Szwajcaria" ? "center" : "stretch"
+                          }
+                          imageStyle={{ height: "100%", width: "100%" }}
+                          style={{
+                            aspectRatio: 1.5/1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <LinearGradient
+                            colors={
+                              colorScheme == "light"
+                                ? parseInt(item.HomeGoals) >= 0 &&
+                                  parseInt(item.AwayGoals) >= 0
+                                  ? ["#bbb", "#bbb0"]
+                                  : ["#eaeaea", "#eaeaea00"]
+                                : parseInt(item.HomeGoals) >= 0 &&
+                                  parseInt(item.AwayGoals) >= 0
+                                ? ["#212121", "#21212100"]
+                                : ["#333", "#3330"]
+                            }
+                            style={{ width: "100%" }}
+                            start={{ x: 1, y: 1 }}
+                            end={{ x: 0, y: 1 }}
+                          >
+                            <ThemedText type="subtitle"></ThemedText>
+                          </LinearGradient>
+                        </ImageBackground>
+                        <ThemedText
+                          type="subtitle"
+                          numberOfLines={1}
+                          style={{
+                            flex:1,
+                            fontWeight:
+                              item.AwayGoals > item.HomeGoals
+                                ? "bold"
+                                : "normal",
+                          }}
+                        >
+                          {item.Away}
+                        </ThemedText>
+                      </View>
                       <ThemedText
                         type="subtitle"
                         style={{
-                          fontWeight:
-                            item.AwayGoals > item.HomeGoals ? "bold" : "normal",
-                        }}
-                      >
-                        {item.Away}
-                      </ThemedText>
-
-                      <ThemedText
-                        type="subtitle"
-                        style={{
+                          marginLeft: 5,
                           fontWeight:
                             item.AwayGoals > item.HomeGoals ? "bold" : "normal",
                         }}
@@ -166,6 +277,48 @@ export default function matches() {
                     <ThemedText type="default">{item.Hour}</ThemedText>
                   </View>
                 </View>
+                {predictions[item.id] ? (
+                  <View>
+                    <ThemedSeparator />
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <ThemedText style={{ fontSize: 14, flex: 1 }}>
+                        Twój typ:
+                      </ThemedText>
+                      <View style={{ flex: 1, alignItems: "center" }}>
+                        <ThemedText
+                          style={{
+                            fontSize: 14,
+                            backgroundColor: Colors.darkblue,
+                            borderRadius: 10,
+                            paddingHorizontal: 10,
+                          }}
+                        >
+                          {predictions[item.id].Home} -{" "}
+                          {predictions[item.id].Away}
+                        </ThemedText>
+                      </View>
+                      {predictions[item.id].points >= 0 ? (
+                        <ThemedText
+                        numberOfLines={1}
+                          style={{ fontSize: 14, flex: 1, textAlign: "right" }}
+                        >
+                          +{predictions[item.id].points}{" "}
+                          {predictions[item.id].points > 1
+                            ? "punkty"
+                            : predictions[item.id].points == 0
+                            ? "punktów"
+                            : "punkt"}
+                        </ThemedText>
+                      ) : (
+                        <View style={{ flex: 1 }}></View>
+                      )}
+                    </View>
+                  </View>
+                ) : (
+                  <></>
+                )}
               </ThemedView>
             </TouchableOpacity>
           ))

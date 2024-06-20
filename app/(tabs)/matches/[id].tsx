@@ -12,7 +12,7 @@ import {
   useColorScheme,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { onValue, ref, set } from "firebase/database";
@@ -26,6 +26,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
 import { Collapsible } from "@/components/Collapsible";
 import { Ionicons } from "@expo/vector-icons";
+import { StackActions } from "@react-navigation/native";
 
 type Match = {
   id: number;
@@ -60,33 +61,6 @@ export default function matchDetails() {
   const [AwaySquad, setAwaySquad] = useState<Squad[]>([]);
   const [predictions, setPredictions] = useState<any[]>([]);
   const today = new Date();
-  const [squad, setSquad] = useState<Squad[]>([
-    { kitNumber: 1, name: "Manuel", surname: "Neuer" },
-    { kitNumber: 2, name: "Antonio", surname: "Rudiger" },
-    { kitNumber: 3, name: "David", surname: "Raum" },
-    { kitNumber: 4, name: "Jonathan", surname: "Tah" },
-    { kitNumber: 5, name: "Pascal", surname: "Gross" },
-    { kitNumber: 6, name: "Joshua", surname: "Kimmich" },
-    { kitNumber: 7, name: "Kai", surname: "Havertz" },
-    { kitNumber: 8, name: "Toni", surname: "Kross" },
-    { kitNumber: 9, name: "Niclas", surname: "Fullkrug" },
-    { kitNumber: 10, name: "Jamal", surname: "Musiala" },
-    { kitNumber: 11, name: "Chris", surname: "Fuhrich" },
-    { kitNumber: 12, name: "Oliver", surname: "Baumann" },
-    { kitNumber: 13, name: "Thomas", surname: "Muller" },
-    { kitNumber: 14, name: "Maximilian", surname: "Beier" },
-    { kitNumber: 15, name: "Nico", surname: "Schlotterbeck" },
-    { kitNumber: 16, name: "Waldemar", surname: "Anton" },
-    { kitNumber: 17, name: "Florian", surname: "Wirtz" },
-    { kitNumber: 18, name: "Maximilian", surname: "Mittelstadt" },
-    { kitNumber: 19, name: "Leroy", surname: "Sane" },
-    { kitNumber: 20, name: "Benjamin", surname: "Henrichs" },
-    { kitNumber: 21, name: "Ilkay", surname: "Gundogan" },
-    { kitNumber: 22, name: "Marc-Andre", surname: "ter Stegen" },
-    { kitNumber: 23, name: "Robert", surname: "Andrich" },
-    { kitNumber: 24, name: "Robin", surname: "Koch" },
-    { kitNumber: 26, name: "Undav", surname: "Deniz" },
-  ]);
   const onModalOpen = () => {
     setIsModalVisible(true);
   };
@@ -100,7 +74,21 @@ export default function matchDetails() {
     setIsHelpVisible(false);
   };
   const [match, setMatch] = useState<Match>();
-  //const addSquad = () => {set(ref(db, 'nations/Niemcy/'), {squad})};
+  const route = useNavigation();
+  function beforeMatch(date: any) {
+    if (
+      (parseInt(date?.Date.split(".")[0] as string) > today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) >= today.getMonth() + 1) ||
+      parseInt(date?.Date.split(".")[1] as string) > today.getMonth() + 1 ||
+      (parseInt(date?.Date.split(".")[0] as string) == today.getDate() &&
+        parseInt(date?.Date.split(".")[1] as string) == today.getMonth() + 1 &&
+        parseInt(date?.Hour.split(":")[0] as string) > today.getHours())
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   useEffect(() => {
     onValue(ref(db, "matches/" + [id]), (snapshot) => {
       const data = snapshot.val();
@@ -290,14 +278,7 @@ export default function matchDetails() {
                 {prediction ? prediction.Away : "-"}
               </ThemedText>
             </View>
-            {(parseInt(match?.Date.split(".")[0] as string) > today.getDate() &&
-              parseInt(match?.Date.split(".")[1] as string) >=
-                today.getMonth() + 1) ||
-            (parseInt(match?.Date.split(".")[0] as string) == today.getDate() &&
-              parseInt(match?.Date.split(".")[1] as string) ==
-                today.getMonth() + 1 &&
-              parseInt(match?.Hour.split(":")[0] as string) >
-                today.getHours()) ? (
+            {beforeMatch(match) ? (
               <TouchableNativeFeedback
                 onPress={() => {
                   onModalOpen();
@@ -331,8 +312,8 @@ export default function matchDetails() {
                   <></>
                 )}
                 {prediction &&
-                match!.HomeGoals>=0 &&
-                match!.AwayGoals>=0 &&
+                match!.HomeGoals >= 0 &&
+                match!.AwayGoals >= 0 &&
                 ((prediction?.Home > prediction?.Away &&
                   match!.HomeGoals > match!.AwayGoals) ||
                   (prediction?.Home < prediction?.Away &&
@@ -344,10 +325,10 @@ export default function matchDetails() {
                   <></>
                 )}
                 {prediction &&
-                match?.HomeGoals &&
-                match?.AwayGoals &&
-                prediction?.Home - prediction?.Away ===
-                  match?.HomeGoals - match?.AwayGoals ? (
+                match!.HomeGoals >= 0 &&
+                match!.AwayGoals >= 0 &&
+                Math.abs(prediction?.Home - prediction?.Away) ===
+                  Math.abs(match!.HomeGoals - match!.AwayGoals) ? (
                   <ThemedText type="light">Różnica bramek +1</ThemedText>
                 ) : (
                   <></>
@@ -364,12 +345,13 @@ export default function matchDetails() {
           </Collapsible>
 
           <Collapsible title="Typowania innych">
-            {predictions
+          {!beforeMatch(match) ? 
+            ( predictions.length > 0 ? predictions
               .sort((a, b) => (a.points > b.points ? -1 : 1))
               .map((item: any, index: any) => (
                 <View key={index}>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <ThemedText type="light" style={{ flex: 1 }}>
+                    <ThemedText type="default" style={{ flex: 1 }}>
                       {index + 1}. {item.name}
                     </ThemedText>
                     <ThemedText
@@ -380,7 +362,7 @@ export default function matchDetails() {
                     </ThemedText>
                     {item.points >= 0 ? (
                       <ThemedText
-                        type="light"
+                        type="default"
                         style={{ flex: 1, textAlign: "right" }}
                       >
                         +{item.points}{" "}
@@ -400,7 +382,9 @@ export default function matchDetails() {
                     darkColor={Colors.darkgrey}
                   />
                 </View>
-              ))}
+              )) : <ThemedText style={{textAlign: 'center'}}>Nikt nie obstawiał tego meczu.</ThemedText>) : (
+                <ThemedText style={{textAlign:'center'}}>Typowania innych będą dostępnę po rozpoczęciu meczu.</ThemedText>
+              )}
           </Collapsible>
 
           <Collapsible title="Składy">
@@ -409,7 +393,7 @@ export default function matchDetails() {
                 flex: 1,
                 flexDirection: "row",
                 justifyContent: "space-between",
-                padding: 10,
+                gap: 10,
               }}
             >
               <View style={{ flex: 1 }}>
@@ -428,7 +412,7 @@ export default function matchDetails() {
                           resizeMode="center"
                           imageStyle={{}}
                           style={{
-                            flex: 1,
+                            aspectRatio: 1/1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}
@@ -494,7 +478,7 @@ export default function matchDetails() {
                           resizeMode="center"
                           imageStyle={{}}
                           style={{
-                            flex: 1,
+                            aspectRatio: 1/1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}
