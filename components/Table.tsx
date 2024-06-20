@@ -77,7 +77,7 @@ export default function Table({ g, index, style }: any) {
         {teams.map((item, index) => (
           <View key={index} style={styles.tableTeam}>
             <View style={{flex:5, flexDirection: 'row'}}>
-            <ThemedText style={{flex:2, textAlign:'right'}}>{index+1}.</ThemedText>
+            <ThemedText style={{ textAlign:'right'}}>{index+1}.</ThemedText>
             <Image
                 source={Flag[item.name] ? Flag[item.name] : require("../assets/images/flags/polska.png")}
                 resizeMode="center"

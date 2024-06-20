@@ -97,9 +97,20 @@ export default function Settings() {
   ]
 
 );
+  const [match, setMatch] = useState<any>({
+    id: 36,
+    Home: 'Gruzja',
+    Away: 'Portugalia',
+    Date: '26.06.24',
+    Hour: '21:00',
+    Matchday: 3,
+    Phase: 'Faza grupowa',
+    Stadium: 'Veltins Arena',
+  })
   
   const scoreSource = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   useEffect(() => {
+    //set(ref(db, 'matches/36/'), {...match});
     //set(ref(db, 'nations/Szwajcaria/'), {squad});
     onValue(ref(db, "matches/"), (snapshot) => {
       const data = snapshot.val();

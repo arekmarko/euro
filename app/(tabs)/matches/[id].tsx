@@ -295,7 +295,22 @@ export default function matchDetails() {
                   darkColor={Colors.darkgrey}
                   lightColor={Colors.grey}
                 >
-                  <ThemedText>
+                  {prediction ? (
+                    <></>
+                  ) : (
+                    <View
+                      style={{
+                        transform: [{ translateX: 3 }, { translateY: -3 }],
+                        width: 10,
+                        height: 10,
+                        borderRadius: 10,
+                        backgroundColor: "red",
+                        position: "absolute",
+                        right: 0,
+                      }}
+                    ></View>
+                  )}
+                  <ThemedText style={{textAlign: 'center'}}>
                     {prediction ? "Zmień wynik" : "Obstaw wynik"}
                   </ThemedText>
                 </ThemedView>
@@ -345,46 +360,86 @@ export default function matchDetails() {
           </Collapsible>
 
           <Collapsible title="Typowania innych">
-          {!beforeMatch(match) ? 
-            ( predictions.length > 0 ? predictions
-              .sort((a, b) => (a.points > b.points ? -1 : 1))
-              .map((item: any, index: any) => (
-                <View key={index}>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <ThemedText type="default" style={{ flex: 1 }}>
-                      {index + 1}. {item.name}
-                    </ThemedText>
-                    <ThemedText
-                      type="default"
-                      style={{ flex: 1, textAlign: "center" }}
-                    >
-                      {item.home} - {item.away}
-                    </ThemedText>
-                    {item.points >= 0 ? (
-                      <ThemedText
-                        type="default"
-                        style={{ flex: 1, textAlign: "right" }}
+            {!beforeMatch(match) ? (
+              predictions.length > 0 ? (
+                predictions
+                  .sort((a, b) => (a.points > b.points ? -1 : 1))
+                  .map((item: any, index: any) => (
+                    <View key={index}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        +{item.points}{" "}
-                        {item.points > 1
-                          ? "punkty"
-                          : item.points == 0
-                          ? "punktów"
-                          : "punkt"}
-                      </ThemedText>
-                    ) : (
-                      <></>
-                    )}
-                  </View>
-                  <ThemedSeparator
-                    style={{ margin: 0 }}
-                    lightColor={Colors.grey}
-                    darkColor={Colors.darkgrey}
-                  />
-                </View>
-              )) : <ThemedText style={{textAlign: 'center'}}>Nikt nie obstawiał tego meczu.</ThemedText>) : (
-                <ThemedText style={{textAlign:'center'}}>Typowania innych będą dostępnę po rozpoczęciu meczu.</ThemedText>
-              )}
+                        <ThemedText type="default" style={{ flex: 1 }}>
+                          {index + 1}. {item.name}
+                        </ThemedText>
+                        <ThemedText
+                          type="default"
+                          style={{ flex: 1, textAlign: "center" }}
+                        >
+                          {item.home} - {item.away}
+                        </ThemedText>
+                        {item.points >= 0 ? (
+                          <ThemedText
+                            type="default"
+                            style={{ flex: 1, textAlign: "right" }}
+                          >
+                            +{item.points}{" "}
+                            {item.points > 1
+                              ? "punkty"
+                              : item.points == 0
+                              ? "punktów"
+                              : "punkt"}
+                          </ThemedText>
+                        ) : (
+                          <View style={{flex:1}}></View>
+                        )}
+                      </View>
+                      <ThemedSeparator
+                        style={{ margin: 0 }}
+                        lightColor={Colors.grey}
+                        darkColor={Colors.darkgrey}
+                      />
+                    </View>
+                  ))
+              ) : (
+                <ThemedText style={{ textAlign: "center" }}>
+                  Nikt nie obstawiał tego meczu.
+                </ThemedText>
+              )
+            ) : (
+              <View>
+              <ThemedText style={{ textAlign: "center", margin: 10 }}>
+                Wyniki innych będą dostępnę po rozpoczęciu meczu.
+              </ThemedText>
+              {predictions.length > 0 ? (
+                predictions
+                  .sort((a, b) => (a.points > b.points ? -1 : 1))
+                  .map((item: any, index: any) => (
+                    <View key={index}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <ThemedText type="default" style={{ flex: 1 }}>
+                          {index + 1}. {item.name}
+                        </ThemedText>
+                        
+                      </View>
+                      <ThemedSeparator
+                        style={{ margin: 0 }}
+                        lightColor={Colors.grey}
+                        darkColor={Colors.darkgrey}
+                      />
+                    </View>
+                  ))
+              ): <></>}
+              </View>
+            )}
+          </Collapsible>
+
+          <Collapsible title="Forma zespołów">
+          <View>
+
+          </View>
           </Collapsible>
 
           <Collapsible title="Składy">
@@ -409,10 +464,10 @@ export default function matchDetails() {
                       >
                         <ImageBackground
                           source={Flag[match?.Home as string]}
-                          resizeMode="center"
+                          resizeMode="stretch"
                           imageStyle={{}}
                           style={{
-                            aspectRatio: 1/1,
+                            aspectRatio: match?.Home=='Szwajcaria' ? 1/1 : 1.5/1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}
@@ -468,17 +523,16 @@ export default function matchDetails() {
                       >
                         <ThemedText
                           numberOfLines={1}
-                          style={{ textAlign: "right", flex: 5 }}
+                          style={{ textAlign: "right", flex: 1 }}
                         >
                           {item.name[0]}. {item.surname}
                         </ThemedText>
-                        {/* <Image source={Flag[match?.Home as string]} resizeMode="center"  style={{width: '10%', height: '100%'}} /> */}
                         <ImageBackground
                           source={Flag[match?.Away as string]}
-                          resizeMode="center"
+                          resizeMode="stretch"
                           imageStyle={{}}
                           style={{
-                            aspectRatio: 1/1,
+                            aspectRatio: match?.Away=='Szwajcaria' ? 1/1 : 1.5/1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}

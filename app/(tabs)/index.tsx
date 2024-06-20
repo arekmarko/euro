@@ -58,6 +58,7 @@ export default function HomeScreen() {
   });
   const scrollRef = useRef<FlatList>(null);
   const [initIndex, setInitIndex] = useState(0);
+  const [itemWidth, setItemWidth] = useState(200);
   const [matches, setMatches] = useState<Match[]>([]);
   const routers = useNavigation();
   const dimensions = useWindowDimensions();
@@ -76,7 +77,6 @@ export default function HomeScreen() {
       return false;
     }
   }
-  
   useEffect(() => {
     onValue(
       ref(db, "users/" + auth.currentUser?.displayName + "/"),
@@ -99,6 +99,15 @@ export default function HomeScreen() {
         ...data[key],
       }));
       setMatches(newData);
+      let tmp = true;
+      newData.forEach(element => {
+        if (beforeMatch(element) && tmp){
+          tmp = false;
+          setInitIndex(element.id-1)
+          //console.log(element.id)
+          //setTimeout(() => scrollRef.current?.scrollToIndex({index: element.id-1, viewPosition: 0.5}), 500);
+        }
+      });
     });
     const backAction = () => {
       if (routers.getState().index != 0) {
@@ -199,10 +208,15 @@ export default function HomeScreen() {
       </ThemedView>
       {matches.length > 0 ? (
         <FlatList
+          ref={scrollRef}
+          initialScrollIndex={initIndex}
+          getItemLayout={(data, index) => (
+            {length: 240, offset: 240 * index, index}
+          )}
           data={matches}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ width: 20 }}></View>}
+          //ItemSeparatorComponent={() => <View style={{ width: 20 }}></View>}
           renderItem={({ item, index }) => (
             <TouchableOpacity
               activeOpacity={0.7}
@@ -211,17 +225,19 @@ export default function HomeScreen() {
               <ThemedView
                 lightColor={Colors.grey}
                 darkColor={Colors.darkgrey}
-                style={{ minWidth: 200, borderRadius: 20, padding: 10 }}
+                style={{ width: 220, borderRadius: 20, padding: 10, marginRight: 20,
+                  opacity: beforeMatch(item) ? 1 : 0.6
+                }}
               >
                 <View style={{ flexDirection: "row" }}>
                   <View style={{ flex: 1, paddingHorizontal: 3 }}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', gap: 10}}>
-                    <ThemedText type="default" style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.Home}</ThemedText>
+                    <ThemedText numberOfLines={1} type="default" style={{flex: 1,fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.Home}</ThemedText>
                     <ThemedText type="default" style={{fontWeight: item.HomeGoals>item.AwayGoals ? 'bold' : 'normal'}}>{item.HomeGoals}</ThemedText>
                     </View>
                     <ThemedSeparator style={{ marginVertical: 2 }} />
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', gap: 10}}>
-                    <ThemedText type="default" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.Away}</ThemedText>
+                    <ThemedText numberOfLines={1} type="default" style={{flex: 1,fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.Away}</ThemedText>
                     <ThemedText type="default" style={{fontWeight: item.AwayGoals>item.HomeGoals ? 'bold' : 'normal'}}>{item.AwayGoals}</ThemedText>
                     </View>                  
                   </View>

@@ -13,6 +13,8 @@ import { LinearGradient } from "expo-linear-gradient";
 export default function standings() {
   const colorScheme = useColorScheme();
   const [rankingData, setRankingData] = useState<string[]>([]);
+  const [predictions, setPredictions] = useState([]);
+  const [myData, setMyData] = useState({});
   useEffect(() => {
     onValue(ref(db, "users"), (snapshot) => {
       const data = snapshot.val();
@@ -22,6 +24,22 @@ export default function standings() {
       newData.sort((a, b) => (a.points > b.points ? -1 : 1));
       setRankingData(newData);
     });
+    onValue(
+      ref(db, "typer/" + auth.currentUser?.displayName + "/"),
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setPredictions(data);
+          let threepointer = 0;
+          data.forEach((element:any) => {
+            if (element.points==3){
+              threepointer++;
+            }
+          });
+          setMyData({three: threepointer})
+        }
+      }
+    );
   }, []);
   return (
     <ParallaxScrollView

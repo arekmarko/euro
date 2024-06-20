@@ -38,7 +38,7 @@ type Match = {
 
 export default function matches() {
   const colorScheme = useColorScheme() ?? "light";
-  const scrollRef = useRef<FlatList>(null);
+  const [coordinate, setCoordinate] = useState(3000);
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<any[]>([]);
   const today = new Date();
@@ -68,12 +68,15 @@ export default function matches() {
       ref(db, "typer/" + auth.currentUser?.displayName + "/"),
       (snapshot) => {
         const data = snapshot.val();
-        setPredictions(data);
+        if (data){
+          setPredictions(data);
+        }
       }
     );
   }, []);
   return (
     <ParallaxScrollView
+    //scrollPosition={coordinate}
       headerBackgroundColor={{
         lightLeft: Colors.yellow,
         lightRight: "red",
@@ -93,7 +96,11 @@ export default function matches() {
         {matches.length > 0 ? (
           matches.map((item: any, index: any) => (
             <TouchableOpacity
-              ref={(r) => scrollRef}
+              onLayout={(event) => {
+                const layout = event.nativeEvent.layout;
+                //coordinate[item.key] = layout.y;
+                //console.log(layout.y);
+              }}
               activeOpacity={0.7}
               key={index}
               onPress={() => {
@@ -103,25 +110,26 @@ export default function matches() {
               <ThemedView
                 lightColor={
                   parseInt(item.HomeGoals) >= 0 && parseInt(item.AwayGoals) >= 0
-                    ? "#bbb"
-                    : Colors.grey
+                  ? "#bbb"
+                  : Colors.grey
                 }
                 darkColor={
                   parseInt(item.HomeGoals) >= 0 && parseInt(item.AwayGoals) >= 0
-                    ? "#212121"
-                    : Colors.darkgrey
+                  ? "#212121"
+                  : Colors.darkgrey
                 }
                 style={{
                   marginVertical: 10,
                   borderRadius: 20,
                   padding: 10,
                   opacity:
-                    parseInt(item.HomeGoals) >= 0 &&
-                    parseInt(item.AwayGoals) >= 0
-                      ? 0.7
-                      : 1,
+                  parseInt(item.HomeGoals) >= 0 &&
+                  parseInt(item.AwayGoals) >= 0
+                  ? 0.7
+                  : 1,
                 }}
-              >
+                >
+                {predictions[item.id] || !beforeMatch(item) ? <></> : <View style={{transform: [{translateX: 3}, {translateY: -3}], backgroundColor: 'red', height: 15, width: 15, borderRadius: 10, position: 'absolute', right: 0}}></View>}
                 <View
                   style={{
                     flexDirection: "row",
@@ -145,7 +153,7 @@ export default function matches() {
                         <ImageBackground
                           source={Flag[item.Home as string]}
                           resizeMode={
-                            item.Away == "Szwajcaria" ? "center" : "stretch"
+                            item.Home == "Szwajcaria" ? "center" : "stretch"
                           }
                           imageStyle={{ height: "100%", width: "100%" }}
                           style={{
@@ -289,6 +297,7 @@ export default function matches() {
                       <View style={{ flex: 1, alignItems: "center" }}>
                         <ThemedText
                           style={{
+                            color: Colors.white,
                             fontSize: 14,
                             backgroundColor: Colors.darkblue,
                             borderRadius: 10,

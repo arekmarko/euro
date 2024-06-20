@@ -70,14 +70,15 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
         <View style={{ flexDirection: "row", flex: 1, alignItems: 'center' }}>
           <View style={{flex: 1, alignItems: 'center'}}>
             <ThemedText type="subtitle" numberOfLines={1}>{match?.Home}</ThemedText>
-            <View style={{ height: "60%", width: 100, alignSelf: 'center' }}>
+            <View style={{ height: 300, width: 100, alignSelf: 'center' }}>
               <ScrollPicker
                 dataSource={scoreSource}
                 selectedIndex={prediction.Home}
                 renderItem={(data, index) => (
                   <ThemedText
                     type="boldNumber"
-                    style={{ fontSize: 42, width: 100, textAlign: "center" }}
+                    allowFontScaling={false}
+                    style={{ fontSize: 68, width: 100, textAlign: "center" }}
                   >
                     {data}
                   </ThemedText>
@@ -85,8 +86,8 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleHomePrediction(data);
                 }}
-                wrapperHeight={240}
-                itemHeight={70}
+                wrapperHeight={300}
+                itemHeight={100}
                 wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
                 highlightColor="#777"
                 highlightBorderWidth={2}
@@ -95,14 +96,15 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
           </View>
           <View style={{flex: 1, alignItems: 'center'}}>
             <ThemedText type="subtitle" numberOfLines={1}>{match?.Away}</ThemedText>
-            <View style={{ height: "60%", width: 100, alignSelf: 'center' }}>
+            <View style={{ height: 300, width: 100, alignSelf: 'center' }}>
               <ScrollPicker
                 dataSource={scoreSource}
                 selectedIndex={prediction.Away}
                 renderItem={(data, index) => (
                   <ThemedText
                     type="boldNumber"
-                    style={{ fontSize: 42, width: 100, textAlign: "center" }}
+                    allowFontScaling={false}
+                    style={{ fontSize: 68, width: 100, textAlign: "center" }}
                   >
                     {data}
                   </ThemedText>
@@ -110,9 +112,9 @@ export default function ScorePicker({ isVisible, onClose, match }: any) {
                 onValueChange={(data, selectedIndex) => {
                   handleAwayPrediction(data);
                 }}
-                wrapperHeight={240}
+                wrapperHeight={300}
                 wrapperBackground={colorScheme==='light' ? Colors.grey : Colors.darkgrey}
-                itemHeight={70}
+                itemHeight={100}
                 highlightColor="#777"
                 highlightBorderWidth={2}
               />
