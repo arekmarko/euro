@@ -1,12 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { Stack } from 'expo-router'
+import { Stack, Tabs } from 'expo-router'
 
 export default function _layout() {
   return (
-    <Stack screenOptions={{headerShown: false}} initialRouteName='index'>
+    <Stack screenOptions={{headerShown: false, freezeOnBlur:true}} initialRouteName='index' >
         <Stack.Screen name="index" />
-        <Stack.Screen name="[id]" />
     </Stack>
   )
 }

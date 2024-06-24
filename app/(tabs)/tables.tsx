@@ -11,6 +11,7 @@ import Table from "@/components/Table";
 export default function Tables() {
   const colorScheme = useColorScheme() ?? "light";
   const [table, setTable] = useState<string[]>([]);
+  const [tableLast, setTableLast] = useState([]);
 
   useEffect(() => {
     const dbRef = ref(db, "groups/");
@@ -20,6 +21,7 @@ export default function Tables() {
         ...data[key],
       }));
       setTable(newData);
+
     });
   }, []);
 

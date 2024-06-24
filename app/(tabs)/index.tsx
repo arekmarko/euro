@@ -22,7 +22,7 @@ import { Colors } from "@/constants/Colors";
 import { auth, db } from "@/firebaseConfig";
 import { useEffect, useRef, useState } from "react";
 import { router, useNavigation } from "expo-router";
-import { limitToFirst, onValue, query, ref } from "firebase/database";
+import { limitToFirst, onValue, query, ref, set } from "firebase/database";
 import Table from "@/components/Table";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
 import { Ionicons } from "@expo/vector-icons";
@@ -58,7 +58,7 @@ export default function HomeScreen() {
   });
   const scrollRef = useRef<FlatList>(null);
   const [initIndex, setInitIndex] = useState(0);
-  const [itemWidth, setItemWidth] = useState(200);
+  const [predictions, setPredictions] = useState<any[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const routers = useNavigation();
   const dimensions = useWindowDimensions();
@@ -104,15 +104,25 @@ export default function HomeScreen() {
         if (beforeMatch(element) && tmp){
           tmp = false;
           setInitIndex(element.id-1)
-          //console.log(element.id)
-          //setTimeout(() => scrollRef.current?.scrollToIndex({index: element.id-1, viewPosition: 0.5}), 500);
         }
       });
     });
+    onValue(
+      ref(db, "typer/" + auth.currentUser?.displayName + "/"),
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setPredictions(data);
+        }
+      }
+    );
+    set(ref(db, "version/" + auth.currentUser?.displayName + '/'), {
+      version: '1.0.1'
+    });
     const backAction = () => {
       if (routers.getState().index != 0) {
-        //router.navigate("(tabs)");
-        router.back();
+        router.navigate("(tabs)");
+        //router.back();
       } else {
         BackHandler.exitApp();
       }
@@ -220,15 +230,18 @@ export default function HomeScreen() {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               activeOpacity={0.7}
-              //onPress={() => {router.push('matches/' + item.id)}}
+              onPress={() => {router.navigate(`matches/${item.id}`)}}
             >
               <ThemedView
                 lightColor={Colors.grey}
                 darkColor={Colors.darkgrey}
-                style={{ width: 220, borderRadius: 20, padding: 10, marginRight: 20,
+                style={{ width: 220, borderRadius: 20, padding: 10, paddingTop: 0, marginRight: 20,
                   opacity: beforeMatch(item) ? 1 : 0.6
                 }}
               >
+                  <View style={{ backgroundColor: predictions[item.id] ? Colors.darkblue : Colors.orange , paddingHorizontal: 15, borderBottomLeftRadius: 10, borderBottomRightRadius: 10,top:0, alignSelf:'center', justifyContent: 'center'}}>
+                    <ThemedText style={{fontSize: 12, color: Colors.white}}>{predictions[item.id] ? predictions[item.id]?.Home + ' - ' + predictions[item.id]?.Away : 'Nie obstawiono'}{predictions[item.id]?.points>=0 ? ('   |   +' + predictions[item.id].points + ' ' + (predictions[item.id].points>1 ? 'punkty' : (predictions[item.id].points==1 ? 'punkt' : 'punktów'))) : ''}</ThemedText>
+                  </View>
                 <View style={{ flexDirection: "row" }}>
                   <View style={{ flex: 1, paddingHorizontal: 3 }}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', gap: 10}}>

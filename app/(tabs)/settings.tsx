@@ -58,6 +58,7 @@ export default function Settings() {
   const [addResultVisible, setAddResultVisible] = useState(false);
   const [matchListVisible, setMatchVisible] = useState(false);
   const [message, setMessage] = useState("");
+  const [playersData, setPlayersData] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [selectedMatch, setSelectedMatch] = useState(0);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -68,33 +69,36 @@ export default function Settings() {
   const [playersPrediction, setPlayerPrediction] = useState<any[]>([]);
   const [squad, setSquad] = useState<Squad[]>(
     [
-      { kitNumber: 1, name: "Yann", surname: "Sommer" },
-      { kitNumber: 2, name: "Leonidas", surname: "Stergiou" },
-      { kitNumber: 3, name: "Silvan", surname: "Widmer" },
-      { kitNumber: 4, name: "Nico", surname: "Elvedi" },
-      { kitNumber: 5, name: "Manuel", surname: "Akanji" },
-      { kitNumber: 6, name: "Denis", surname: "Zakaria" },
-      { kitNumber: 7, name: "Breel", surname: "Embolo" },
-      { kitNumber: 8, name: "Remo", surname: "Freuler" },
-      { kitNumber: 9, name: "Noah", surname: "Okafor" },
-      { kitNumber: 10, name: "Granit", surname: "Xhaka" },
-      { kitNumber: 11, name: "Renato", surname: "Steffen" },
-      { kitNumber: 12, name: "Yvon", surname: "Mvogo" },
-      { kitNumber: 13, name: "Ricardo", surname: "Rodriguez" },
-      { kitNumber: 14, name: "Steven", surname: "Zuber" },
-      { kitNumber: 15, name: "Cédric", surname: "Zesiger" },
-      { kitNumber: 16, name: "Vincent", surname: "Sierro" },
-      { kitNumber: 17, name: "Ruben", surname: "Vargas" },
-      { kitNumber: 18, name: "Kwadwo", surname: "Duah" },
-      { kitNumber: 19, name: "Dan", surname: "Ndoye" },
-      { kitNumber: 20, name: "Michel", surname: "Aebischer" },
-      { kitNumber: 21, name: "Gregor", surname: "Kobel" },
-      { kitNumber: 22, name: "Fabian", surname: "Schär" },
-      { kitNumber: 23, name: "Xherdan", surname: "Shaqiri" },
-      { kitNumber: 24, name: "Ardon", surname: "Jashari" },
-      { kitNumber: 25, name: "Zeki", surname: "Amdouni" },
-      { kitNumber: 26, name: "Fabian", surname: "Rieder" }
+      { kitNumber: 1, name: "Bart", surname: "Verbruggen" },
+      { kitNumber: 2, name: "Lutsharel", surname: "Geertruida" },
+      { kitNumber: 3, name: "Matthijs", surname: "de Ligt" },
+      { kitNumber: 4, name: "Virgil", surname: "van Dijk" },
+      { kitNumber: 5, name: "Nathan", surname: "Aké" },
+      { kitNumber: 6, name: "Stefan", surname: "de Vrij" },
+      { kitNumber: 7, name: "Xavi", surname: "Simons" },
+      { kitNumber: 8, name: "Georginio", surname: "Wijnaldum" },
+      { kitNumber: 9, name: "Wout", surname: "Weghorst" },
+      { kitNumber: 10, name: "Memphis", surname: "Depay" },
+      { kitNumber: 11, name: "Cody", surname: "Gakpo" },
+      { kitNumber: 12, name: "Jeremie", surname: "Frimpong" },
+      { kitNumber: 13, name: "Justin", surname: "Bijlow" },
+      { kitNumber: 14, name: "Tijjani", surname: "Reijnders" },
+      { kitNumber: 15, name: "Micky", surname: "van de Ven" },
+      { kitNumber: 16, name: "Joey", surname: "Veerman" },
+      { kitNumber: 17, name: "Daley", surname: "Blind" },
+      { kitNumber: 18, name: "Donyell", surname: "Malen" },
+      { kitNumber: 19, name: "Brian", surname: "Brobbey" },
+      { kitNumber: 20, name: "Ian", surname: "Maatsen" },
+      { kitNumber: 21, name: "Joshua", surname: "Zirkzee" },
+      { kitNumber: 22, name: "Denzel", surname: "Dumfries" },
+      { kitNumber: 23, name: "Mark", surname: "Flekken" },
+      { kitNumber: 24, name: "Jerdy", surname: "Schouten" },
+      { kitNumber: 25, name: "Steven", surname: "Bergwijn" },
+      { kitNumber: 26, name: "Ryan", surname: "Gravenberch" }
   ]
+  
+  
+    
 
 );
   const [match, setMatch] = useState<any>({
@@ -110,8 +114,9 @@ export default function Settings() {
   
   const scoreSource = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   useEffect(() => {
+    console.log('settings')
     //set(ref(db, 'matches/36/'), {...match});
-    //set(ref(db, 'nations/Szwajcaria/'), {squad});
+    //set(ref(db, 'nations/Holandia/'), {squad});
     onValue(ref(db, "matches/"), (snapshot) => {
       const data = snapshot.val();
       const newData = Object.keys(data).map((key) => ({
@@ -125,6 +130,10 @@ export default function Settings() {
         ...data[key],
       }));
       setUsers(data);
+    });
+    onValue(ref(db, "typer/"), (snapshot) => {
+      const playersData = snapshot.val();
+      setPlayersData(playersData);
     });
   }, []);
   const handleMatchListVisible = () => {
@@ -177,13 +186,8 @@ export default function Settings() {
   }
   function saveResult() {
     console.log(matches[selectedMatch].Home + ' ' + prediction.Home + ' - ' + prediction.Away + ' ' + matches[selectedMatch].Away)
-    update(ref(db, "matches/" + (selectedMatch + 1) + "/"), {
-      HomeGoals: prediction.Home,
-      AwayGoals: prediction.Away,
-    })
-    onValue(ref(db, "typer/"), (snapshot) => {
-      const playersData = snapshot.val();
-      for (const playerId in playersData){
+    update(ref(db, "matches/" + (selectedMatch + 1) + "/"), {HomeGoals: prediction.Home,AwayGoals: prediction.Away,})
+    for (const playerId in playersData){
         let tmpPoints = 0;
         for (let i = 0; i <= selectedMatch + 1; i++) {
         if (playersData[playerId][i]) {
@@ -208,20 +212,16 @@ export default function Settings() {
         ...users[key],
       }))
         .sort((a: any, b: any) => (a.points > b.points ? -1 : 1))
-        .map((value: any, index: any) =>
+        .map((value: any, index: any) => {
           users[value.username].ranking = index+1
-        );
-        set(ref(db, 'typer/'), {
-          ...playersData
-        })
-        set(ref(db, 'users/'), {
-          ...users
-        })
+          ,console.log(users[value.username].ranking + '.' + value.username)
+        });
+        set(ref(db, 'typer/'), {...playersData})
+        set(ref(db, 'users/'), {...users})
         ToastAndroid.show(
           "Dodano wynik " + prediction.Home + "-" + prediction.Away,
           ToastAndroid.LONG
         );
-    })
   }
 
   return (

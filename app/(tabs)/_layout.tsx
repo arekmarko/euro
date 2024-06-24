@@ -89,6 +89,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="matches"
         options={{
+          //unmountOnBlur:true,
+          href:'matches/',
           title: "Mecze",
           tabBarIcon: ({ color, focused }) => (
             <View>

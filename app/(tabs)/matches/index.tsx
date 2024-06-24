@@ -19,9 +19,10 @@ import { auth, db } from "@/firebaseConfig";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { ThemedSeparator } from "@/components/ThemedSeparator";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Flag } from "@/constants/Flags";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
 type Match = {
   id: number;
@@ -38,6 +39,8 @@ type Match = {
 
 export default function matches() {
   const colorScheme = useColorScheme() ?? "light";
+  const routers = useNavigation();
+  const scrollRef = useRef<any>();
   const [coordinate, setCoordinate] = useState(3000);
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<any[]>([]);
@@ -57,6 +60,8 @@ export default function matches() {
     }
   }
   useEffect(() => {
+    //console.log(JSON.stringify(routers.getState().routes));
+
     onValue(ref(db, "matches/"), (snapshot) => {
       const data = snapshot.val();
       const newData = Object.keys(data).map((key) => ({
@@ -96,6 +101,7 @@ export default function matches() {
         {matches.length > 0 ? (
           matches.map((item: any, index: any) => (
             <TouchableOpacity
+            ref={scrollRef}
               onLayout={(event) => {
                 const layout = event.nativeEvent.layout;
                 //coordinate[item.key] = layout.y;

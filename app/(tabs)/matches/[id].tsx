@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { onValue, ref, set } from "firebase/database";
+import { onValue, query, ref, set } from "firebase/database";
 import { auth, db } from "@/firebaseConfig";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Colors } from "@/constants/Colors";
@@ -60,6 +60,8 @@ export default function matchDetails() {
   const [HomeSquad, setHomeSquad] = useState<Squad[]>([]);
   const [AwaySquad, setAwaySquad] = useState<Squad[]>([]);
   const [predictions, setPredictions] = useState<any[]>([]);
+  const [HomeHistory, setHomeHistory] = useState<Match[]>([]);
+  const [AwayHistory, setAwayHistory] = useState<Match[]>([]);
   const today = new Date();
   const onModalOpen = () => {
     setIsModalVisible(true);
@@ -101,6 +103,17 @@ export default function matchDetails() {
         const data = snapshot.val();
         setAwaySquad(data);
       });
+      onValue(ref(db, "matches/"), (snapshot) => {
+        const newData = snapshot.val();
+        newData.forEach((element: any) => {
+          if (element.Home == data.Home || element.Away == data.Home) {
+            HomeHistory.push(element);
+          }
+          if (element.Home == data.Away || element.Away == data.Away) {
+            AwayHistory.push(element);
+          }
+        });
+      });
     });
     onValue(
       ref(db, "typer/" + auth.currentUser?.displayName + "/" + [id]),
@@ -127,6 +140,15 @@ export default function matchDetails() {
       }
       setPredictions(playersList);
     });
+    const backAction = () => {
+      router.navigate("(tabs)");
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
   }, []);
   return (
     <ParallaxScrollView
@@ -310,7 +332,7 @@ export default function matchDetails() {
                       }}
                     ></View>
                   )}
-                  <ThemedText style={{textAlign: 'center'}}>
+                  <ThemedText style={{ textAlign: "center" }}>
                     {prediction ? "Zmień wynik" : "Obstaw wynik"}
                   </ThemedText>
                 </ThemedView>
@@ -363,7 +385,7 @@ export default function matchDetails() {
             {!beforeMatch(match) ? (
               predictions.length > 0 ? (
                 predictions
-                  .sort((a, b) => (a.points > b.points ? -1 : 1))
+                  .sort((a, b) => (a.points >= b.points ? -1 : 1))
                   .map((item: any, index: any) => (
                     <View key={index}>
                       <View
@@ -391,7 +413,7 @@ export default function matchDetails() {
                               : "punkt"}
                           </ThemedText>
                         ) : (
-                          <View style={{flex:1}}></View>
+                          <View style={{ flex: 1 }}></View>
                         )}
                       </View>
                       <ThemedSeparator
@@ -408,38 +430,135 @@ export default function matchDetails() {
               )
             ) : (
               <View>
-              <ThemedText style={{ textAlign: "center", margin: 10 }}>
-                Wyniki innych będą dostępnę po rozpoczęciu meczu.
-              </ThemedText>
-              {predictions.length > 0 ? (
-                predictions
-                  .sort((a, b) => (a.points > b.points ? -1 : 1))
-                  .map((item: any, index: any) => (
-                    <View key={index}>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <ThemedText type="default" style={{ flex: 1 }}>
-                          {index + 1}. {item.name}
-                        </ThemedText>
-                        
+                <ThemedText style={{ textAlign: "center", margin: 10 }}>
+                  Wyniki innych będą dostępnę po rozpoczęciu meczu.
+                </ThemedText>
+                {predictions.length > 0 ? (
+                  predictions
+                    .sort((a, b) => (a.points > b.points ? -1 : 1))
+                    .map((item: any, index: any) => (
+                      <View key={index}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <ThemedText type="default" style={{ flex: 1 }}>
+                            {index + 1}. {item.name}
+                          </ThemedText>
+                        </View>
+                        <ThemedSeparator
+                          style={{ margin: 0 }}
+                          lightColor={Colors.grey}
+                          darkColor={Colors.darkgrey}
+                        />
                       </View>
-                      <ThemedSeparator
-                        style={{ margin: 0 }}
-                        lightColor={Colors.grey}
-                        darkColor={Colors.darkgrey}
-                      />
-                    </View>
-                  ))
-              ): <></>}
+                    ))
+                ) : (
+                  <></>
+                )}
               </View>
             )}
           </Collapsible>
 
           <Collapsible title="Forma zespołów">
-          <View>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 1 }}>
+                {HomeHistory.map((item, index) => (
+                  <View key={index} style={{ margin: 5 }}>
+                    {item.HomeGoals >= 0 && item.AwayGoals >= 0 ? (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 15,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            backgroundColor:
+                              item.Home == match?.Home
+                                ? item.HomeGoals > item.AwayGoals
+                                  ? "green"
+                                  : item.HomeGoals == item.AwayGoals
+                                  ? "orange"
+                                  : "red"
+                                : item.AwayGoals > item.HomeGoals
+                                ? "green"
+                                : item.AwayGoals == item.HomeGoals
+                                ? "orange"
+                                : "red",
+                            padding: 3,
+                            borderRadius: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ThemedText lightColor={Colors.white}>
+                            {item.Home == match?.Home
+                              ? item.HomeGoals + " - " + item.AwayGoals
+                              : item.AwayGoals + " - " + item.HomeGoals}
+                          </ThemedText>
+                        </View>
+                        <ThemedText style={{ flex: 3 }} numberOfLines={1}>
+                          vs {item.Home == match?.Home ? item.Away : item.Home}
+                        </ThemedText>
+                      </View>
+                    ) : (
+                      <></>
+                    )}
+                  </View>
+                ))}
+              </View>
+              <View style={{ flex: 1 }}>
 
-          </View>
+              {AwayHistory.map((item, index) => (
+                  <View key={index} style={{ margin: 5 }}>
+                    {item.HomeGoals >= 0 && item.AwayGoals >= 0 ? (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 15,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                                <ThemedText style={{ flex: 3, textAlign: 'right' }} numberOfLines={1}>
+                                  {item.Away == match?.Away ? item.Home : item.Away} vs
+                                </ThemedText>
+                        <View
+                          style={{
+                            backgroundColor:
+                              item.Away == match?.Away
+                                ? item.AwayGoals > item.HomeGoals
+                                  ? "green"
+                                  : item.HomeGoals == item.AwayGoals
+                                  ? "orange"
+                                  : "red"
+                                : item.HomeGoals > item.AwayGoals
+                                ? "green"
+                                : item.AwayGoals == item.HomeGoals
+                                ? "orange"
+                                : "red",
+                            padding: 3,
+                            borderRadius: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ThemedText lightColor={Colors.white}>
+                            {item.Away == match?.Away
+                              ? item.HomeGoals + " - " + item.AwayGoals
+                              : item.AwayGoals + " - " + item.HomeGoals}
+                          </ThemedText>
+                        </View>
+                      </View>
+                    ) : (
+                      <></>
+                    )}
+                  </View>
+                ))}
+            </View>
+            </View>
           </Collapsible>
 
           <Collapsible title="Składy">
@@ -467,7 +586,8 @@ export default function matchDetails() {
                           resizeMode="stretch"
                           imageStyle={{}}
                           style={{
-                            aspectRatio: match?.Home=='Szwajcaria' ? 1/1 : 1.5/1,
+                            aspectRatio:
+                              match?.Home == "Szwajcaria" ? 1 / 1 : 1.5 / 1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}
@@ -476,7 +596,7 @@ export default function matchDetails() {
                             colors={
                               colorScheme == "light"
                                 ? ["#fff", "#fff5"]
-                                : ["#000", "#0000"]
+                                : ["#111", "#1110"]
                             }
                             style={{ width: "100%" }}
                             start={{ x: 0, y: 1 }}
@@ -497,7 +617,8 @@ export default function matchDetails() {
                           numberOfLines={1}
                           style={{ textAlign: "left", flex: 5 }}
                         >
-                          {item.name[0]}. {item.surname}
+                          {item.name == "" ? "" : item.name[0] + ". "}
+                          {item.surname}
                         </ThemedText>
                       </View>
                       <ThemedSeparator
@@ -525,14 +646,16 @@ export default function matchDetails() {
                           numberOfLines={1}
                           style={{ textAlign: "right", flex: 1 }}
                         >
-                          {item.name[0]}. {item.surname}
+                          {item.name == "" ? "" : item.name[0] + ". "}
+                          {item.surname}
                         </ThemedText>
                         <ImageBackground
                           source={Flag[match?.Away as string]}
                           resizeMode="stretch"
                           imageStyle={{}}
                           style={{
-                            aspectRatio: match?.Away=='Szwajcaria' ? 1/1 : 1.5/1,
+                            aspectRatio:
+                              match?.Away == "Szwajcaria" ? 1 / 1 : 1.5 / 1,
                             justifyContent: "center",
                             alignItems: "center",
                           }}
@@ -541,7 +664,7 @@ export default function matchDetails() {
                             colors={
                               colorScheme == "light"
                                 ? ["#fff", "#fff5"]
-                                : ["#000", "#0000"]
+                                : ["#111", "#1110"]
                             }
                             style={{ width: "100%" }}
                             start={{ x: 1, y: 1 }}
