@@ -153,16 +153,17 @@ export default function standings() {
       ref(db, "typer/" + auth.currentUser?.displayName + "/"),
       (snapshot) => {
         const data = snapshot.val();
-        const newData = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }));
-        const newTypes: any[] = [];
-        newData.forEach((element) => {
-          if (element.points >= 0) {
-            newTypes.push(element);
-          }
-        });
+        if (data) {
+          const newData = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          const newTypes: any[] = [];
+          newData.forEach((element) => {
+            if (element.points >= 0) {
+              newTypes.push(element);
+            }
+          });
         setMyTypes(newTypes);
         let points: number = 0;
         let anypoints: number = 0;
@@ -173,7 +174,7 @@ export default function standings() {
         let count3: number = 0;
         let streak0: number = 0;
         let tmpstreak0: number = 0;
-        data.forEach((element: any) => {
+        newData.forEach((element: any) => {
           if (element.points >= 0) {
             points = points + element.points;
             if (element.points == 3) {
@@ -211,6 +212,7 @@ export default function standings() {
         };
         setMyStats(newStats);
       }
+      }
     );
   }, []);
   return (
@@ -239,12 +241,10 @@ export default function standings() {
           wyniki
         </ThemedText>
         <ThemedText type="default">
-          <ThemedText type="boldNumber">{myStats.streak}</ThemedText> - Seria
-          punktowa
+          <ThemedText type="boldNumber">{myStats.streak}</ThemedText> - Najdłuższa seria meczów z punktami
         </ThemedText>
         <ThemedText type="default">
-          <ThemedText type="boldNumber">{myStats.streak0}</ThemedText> - Seria
-          meczów bez żadnego punktu
+          <ThemedText type="boldNumber">{myStats.streak0}</ThemedText> - Najdłuższa seria bez punktów
         </ThemedText>
         <ThemedText type="default">
           <ThemedText type="boldNumber">
@@ -443,11 +443,11 @@ export default function standings() {
               </ThemedText>
               <ThemedText type="default" numberOfLines={1}>
                 <ThemedText type="boldNumber">{stats.streak}</ThemedText> -
-                Zdobyte punkty pod rząd
+                Najdłuższa seria meczów z punktami
               </ThemedText>
               <ThemedText type="default" numberOfLines={1}>
                 <ThemedText type="boldNumber">{stats.streak0}</ThemedText> -
-                Seria meczów bez żadnego punktu
+                Najdłuższa seria bez punktów
               </ThemedText>
               <ThemedText type="default">
                 <ThemedText type="boldNumber">

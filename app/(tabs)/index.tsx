@@ -117,7 +117,7 @@ export default function HomeScreen() {
       }
     );
     set(ref(db, "version/" + auth.currentUser?.displayName + '/'), {
-      version: '1.0.1'
+      version: '1.0.2'
     });
     const backAction = () => {
       if (routers.getState().index != 0) {
